@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoricks - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --blue: #007bff; --dark: #0056b3; --bg: #f4f7f9; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        h2 { color: var(--blue); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: var(--blue); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: var(--dark); }
+        .logout { background: #dc3545; margin-top: 10px; }
+        .link { color: var(--blue); cursor: pointer; font-size: 13px; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="auth-card">
+    <h2 id="title">Đăng Nhập</h2>
+    <input type="text" id="user" placeholder="Tài khoản">
+    <input type="password" id="pass" placeholder="Mật khẩu">
+    <button class="btn" onclick="handleAuth()">Xác Nhận</button>
+    <span class="link" onclick="toggle()">Chưa có tài khoản? Đăng ký</span>
+</div>
+
+<div class="card" id="main-card" style="display:none;">
+    <h2>Yoricks Panel</h2>
+    <p>Trạng thái: <b id="st-text" style="color:red">Chưa kích hoạt</b></p>
+    <p>Hạn dùng: <b id="exp-text">N/A</b></p>
+    <hr>
+    <input type="text" id="key-input" placeholder="Nhập Key tại đây">
+    <button class="btn" onclick="activate()">Kích Hoạt Key</button>
+    <button class="btn logout" onclick="logout()">Đăng Xuất</button>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
+        authDomain: "yoricks-sytem.firebaseapp.com",
+        databaseURL: "https://yoricks-sytem-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "yoricks-sytem",
+        storageBucket: "yoricks-sytem.firebasestorage.app",
+        messagingSenderId: "318734426446",
+        appId: "1:318734426446:web:e62527dfe42d8cf48e7e1f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let isLogin = true;
+
+    function toggle() {
+        isLogin = !isLogin;
+        document.getElementById('title').innerText = isLogin ? "Đăng Nhập" : "Đăng Ký";
+    }
+
+    function handleAuth() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+        if(!u || !p) return alert("Điền đủ thông tin!");
+
+        if(!isLogin) {
+            db.ref('users/' + u).set({ password: p, status: "Chưa kích hoạt", exp: "N/A", banned: false })
+            .then(() => alert("Đăng ký xong!"));
+        } else {
+            db.ref('users/' + u).once('value', s => {
+                if(s.exists() && s.val().password === p) {
+                    if(s.val().banned) return alert("Bạn đã bị BAN!");
+                    localStorage.setItem("user", u);
+                    showPanel(s.val());
+                } else alert("Sai tài khoản/mật khẩu!");
+            });
+        }
+    }
+
+    function showPanel(data) {
+        document.getElementById('auth-card').style.display = 'none';
+        document.getElementById('main-card').style.display = 'block';
+        document.getElementById('st-text').innerText = data.status;
+        document.getElementById('exp-text').innerText = data.exp;
+        if(data.status === "Đã kích hoạt") document.getElementById('st-text').style.color = "green";
+    }
+
+    function activate() {
+        const k = document.getElementById('key-input').value;
+        const u = localStorage.getItem("user");
+        db.ref('keys/' + k).once('value', s => {
+            if(s.exists() && !s.val().used) {
+                db.ref('users/' + u).update({ status: "Đã kích hoạt", exp: s.val().duration + " ngày" });
+                db.ref('keys/' + k).update({ used: true, usedBy: u });
+                alert("Kích hoạt thành công!");
+                location.reload();
+            } else alert("Key sai hoặc đã dùng!");
+        });
+    }
+
+    function logout() { localStorage.clear(); location.reload(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Yoricks - Get Key</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 50px 20px; }
+        .btn-package { background: #1e293b; border: 2px solid #334155; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; width: 250px; display: inline-block; }
+        .btn-package:hover { border-color: #3b82f6; background: #1e1b4b; }
+        .start-btn { background: #3b82f6; padding: 15px 40px; border: none; border-radius: 30px; color: white; font-weight: bold; margin-top: 30px; cursor: pointer; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>CHỌN GÓI KEY</h1>
+    <div class="btn-package" id="p1" onclick="select(1)"><h3>Gói 1 Ngày</h3><p>Miễn phí vượt link</p></div>
+    <div class="btn-package" id="p3" onclick="select(3)"><h3>Gói 3 Ngày</h3><p>Vượt link nhanh</p></div>
+    <div class="btn-package" id="p7" onclick="select(7)"><h3>Gói 7 Ngày</h3><p>Ưu tiên cao</p></div>
+    <br>
+    <button class="start-btn" onclick="go()">BẮT ĐẦU VƯỢT LINK</button>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
+        authDomain: "yoricks-sytem.firebaseapp.com",
+        databaseURL: "https://yoricks-sytem-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "yoricks-sytem",
+        storageBucket: "yoricks-sytem.firebasestorage.app",
+        messagingSenderId: "318734426446",
+        appId: "1:318734426446:web:e62527dfe42d8cf48e7e1f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let type = 0;
+
+    function select(d) {
+        type = d;
+        alert("Bạn đã chọn gói " + d + " ngày");
+    }
+
+    function go() {
+        if(type === 0) return alert("Chọn gói đã!");
+        db.ref('settings/links').once('value', s => {
+            const links = s.val();
+            let url = "";
+            if(type === 1) url = links.d1;
+            if(type === 3) url = links.d3;
+            if(type === 7) url = links.d7;
+
+            if(url) {
+                localStorage.setItem("pendingKey", type);
+                window.location.href = url;
+            } else alert("Admin chưa cài link!");
+        });
+    }
+</script>
+</body>
+</html>

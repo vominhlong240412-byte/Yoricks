@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Yoricks</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        body { background: #0b1e3b; color: white; font-family: sans-serif; padding: 20px; }
+        .box { max-width: 500px; margin: auto; background: #162a4a; padding: 20px; border-radius: 10px; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { background: #007bff; color: white; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div id="lock" style="text-align:center; padding-top:100px;">
+    <input type="password" id="ad-p" placeholder="Mật khẩu Admin">
+    <button onclick="check()">Vào Admin</button>
+</div>
+
+<div class="box" id="content" style="display:none;">
+    <h2>Quản Trị Key</h2>
+    <select id="days">
+        <option value="1">1 Ngày</option>
+        <option value="3">3 Ngày</option>
+        <option value="7">7 Ngày</option>
+    </select>
+    <button onclick="gen()">Tạo Key</button>
+    <p id="res" style="color: lime;"></p>
+    <hr>
+    <h3>Link GetKey (Link4M)</h3>
+    <input type="text" id="l1" placeholder="Link gói 1 ngày">
+    <input type="text" id="l3" placeholder="Link gói 3 ngày">
+    <input type="text" id="l7" placeholder="Link gói 7 ngày">
+    <button style="background: #ffc107; color: black;" onclick="upLink()">Cập Nhật Link</button>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
+        authDomain: "yoricks-sytem.firebaseapp.com",
+        databaseURL: "https://yoricks-sytem-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "yoricks-sytem",
+        storageBucket: "yoricks-sytem.firebasestorage.app",
+        messagingSenderId: "318734426446",
+        appId: "1:318734426446:web:e62527dfe42d8cf48e7e1f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function check() {
+        if(document.getElementById('ad-p').value === "LONG") {
+            document.getElementById('lock').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+    }
+
+    function gen() {
+        const d = document.getElementById('days').value;
+        const k = "YOR-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+        db.ref('keys/' + k).set({ duration: d, used: false }).then(() => {
+            document.getElementById('res').innerText = "Đã tạo: " + k;
+        });
+    }
+
+    function upLink() {
+        db.ref('settings/links').set({
+            d1: document.getElementById('l1').value,
+            d3: document.getElementById('l3').value,
+            d7: document.getElementById('l7').value
+        }).then(() => alert("Đã lưu link!"));
+    }
+</script>
+</body>
+</html>

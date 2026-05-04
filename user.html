@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yoricks User Database</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        body { background: #f0f2f5; font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <h2>DANH SÁCH USER</h2>
+    <div id="gate" style="margin-bottom: 20px;">
+        <input type="password" id="p" placeholder="Admin Pass">
+        <button onclick="load()">Xem Data</button>
+    </div>
+    <table id="tbl" style="display:none;">
+        <thead>
+            <tr><th>Tài khoản</th><th>Mật khẩu</th><th>Key</th><th>Hạn</th><th>Ban</th></tr>
+        </thead>
+        <tbody id="body"></tbody>
+    </table>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
+        authDomain: "yoricks-sytem.firebaseapp.com",
+        databaseURL: "https://yoricks-sytem-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "yoricks-sytem",
+        storageBucket: "yoricks-sytem.firebasestorage.app",
+        messagingSenderId: "318734426446",
+        appId: "1:318734426446:web:e62527dfe42d8cf48e7e1f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function load() {
+        if(document.getElementById('p').value !== "LONG") return alert("Sai pass");
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('tbl').style.display = 'table';
+        
+        db.ref('users').on('value', s => {
+            const users = s.val();
+            let h = "";
+            for(let u in users) {
+                h += `<tr>
+                    <td>${u}</td>
+                    <td>${users[u].password}</td>
+                    <td>${users[u].status}</td>
+                    <td>${users[u].exp}</td>
+                    <td><button onclick="ban('${u}', ${users[u].banned})">${users[u].banned ? 'Unban' : 'Ban'}</button></td>
+                </tr>`;
+            }
+            document.getElementById('body').innerHTML = h;
+        });
+    }
+
+    function ban(u, st) {
+        db.ref('users/' + u).update({ banned: !st });
+    }
+</script>
+</body>
+</html>

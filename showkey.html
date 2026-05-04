@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yoricks - Thành Công</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; text-align: center; padding-top: 100px; }
+        .key-box { border: 2px dashed #0f0; padding: 20px; display: inline-block; font-size: 24px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>VƯỢT LINK THÀNH CÔNG!</h1>
+    <p>Đây là Key của bạn (Hết hạn sau 24h nếu không dùng):</p>
+    <div class="key-box" id="final-key">Đang tạo...</div>
+    <br>
+    <button onclick="copy()" style="padding: 10px 20px; cursor:pointer;">COPY KEY</button>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
+        authDomain: "yoricks-sytem.firebaseapp.com",
+        databaseURL: "https://yoricks-sytem-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "yoricks-sytem",
+        storageBucket: "yoricks-sytem.firebasestorage.app",
+        messagingSenderId: "318734426446",
+        appId: "1:318734426446:web:e62527dfe42d8cf48e7e1f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    window.onload = function() {
+        const d = localStorage.getItem("pendingKey") || 1;
+        const k = "YOR-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+        db.ref('keys/' + k).set({ duration: d, used: false }).then(() => {
+            document.getElementById('final-key').innerText = k;
+            localStorage.removeItem("pendingKey");
+        });
+    }
+
+    function copy() {
+        const t = document.getElementById('final-key').innerText;
+        navigator.clipboard.writeText(t);
+        alert("Đã copy!");
+    }
+</script>
+</body>
+</html>
