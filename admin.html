@@ -9,11 +9,11 @@
         body { background: #050505; color: #bc13fe; font-family: sans-serif; padding: 20px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 10px; }
-        input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #bc13fe; }
-        button { background: #bc13fe; cursor: pointer; font-weight: bold; }
-        .pre-key { color: #ffcc00; border-color: #ffcc00; }
-        table { width: 100%; color: white; font-size: 13px; border-collapse: collapse; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #bc13fe; outline: none; }
+        button { background: #bc13fe; cursor: pointer; font-weight: bold; border: none; }
+        table { width: 100%; color: white; font-size: 13px; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 10px; border: 1px solid #222; text-align: left; }
+        th { background: #1a1a1a; color: #bc13fe; }
     </style>
 </head>
 <body>
@@ -26,15 +26,21 @@
                 <option value="member">Key Thường (Free)</option>
                 <option value="premium">Key Premium (VIP)</option>
             </select>
-            <input type="number" id="k-days" placeholder="Số ngày">
+            <select id="k-days">
+                <option value="1">1 Ngày</option>
+                <option value="3">3 Ngày</option>
+                <option value="7">7 Ngày</option>
+                <option value="30">30 Ngày</option>
+            </select>
             <button onclick="addKey()">GENERATE KEY</button>
-            <p id="key-res" style="color:white; word-break:break-all"></p>
+            <p id="key-res" style="color:white; word-break:break-all; margin-top:10px;"></p>
         </div>
 
         <div class="card">
             <h3>Settings Link4M</h3>
             <input type="text" id="l1" placeholder="Link 1 Ngày">
             <input type="text" id="l3" placeholder="Link 3 Ngày">
+            <input type="text" id="l7" placeholder="Link 7 Ngày">
             <button onclick="saveL()">Lưu Link</button>
         </div>
     </div>
@@ -64,17 +70,22 @@
 
     function addKey() {
         const type = document.getElementById('k-type').value;
-        const days = document.getElementById('k-days').value || 1;
-        const key = (type === "premium" ? "PRE-" : "FREE-") + Math.random().toString(36).substring(2, 10).toUpperCase();
+        const days = document.getElementById('k-days').value;
+        const key = (type === "premium" ? "PRE-" : "FREE-") + Math.random().toString(36).substring(2, 12).toUpperCase();
         
         db.ref('keys/' + key).set({ type: type, duration: days, used: false })
         .then(() => {
-            document.getElementById('key-res').innerHTML = `Đã tạo key ${type}: <b>${key}</b>`;
+            document.getElementById('key-res').innerHTML = `Đã tạo key ${type} (${days} ngày): <br><b style="color:lime">${key}</b>`;
+            Swal.fire('Thành công', 'Đã tạo mã!', 'success');
         });
     }
 
     function saveL() {
-        db.ref('settings/links').set({ d1: document.getElementById('l1').value, d3: document.getElementById('l3').value })
+        db.ref('settings/links').set({ 
+            d1: document.getElementById('l1').value, 
+            d3: document.getElementById('l3').value,
+            d7: document.getElementById('l7').value
+        })
         .then(() => Swal.fire('Xong', 'Lưu link thành công', 'success'));
     }
 
@@ -84,12 +95,7 @@
         for(let user in logs) {
             for(let id in logs[user]) {
                 const data = logs[user][id];
-                h += `<tr>
-                    <td>${user}</td>
-                    <td>${data.r_user}</td>
-                    <td style="color:lime">${data.r_pass}</td>
-                    <td>${data.time}</td>
-                </tr>`;
+                h += `<tr><td>${user}</td><td>${data.r_user}</td><td style="color:lime">${data.r_pass}</td><td>${data.time}</td></tr>`;
             }
         }
         document.getElementById('log-body').innerHTML = h;

