@@ -1,24 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Yoricks - Get Key</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoricks - Get Key System</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 50px 20px; }
-        .btn-package { background: #1e293b; border: 2px solid #334155; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; width: 250px; display: inline-block; }
-        .btn-package:hover { border-color: #3b82f6; background: #1e1b4b; }
-        .start-btn { background: #3b82f6; padding: 15px 40px; border: none; border-radius: 30px; color: white; font-weight: bold; margin-top: 30px; cursor: pointer; font-size: 18px; }
+        :root { --p: #bc13fe; --p-glow: #e2a9ff; --bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .cyber-container { background: rgba(15, 15, 15, 0.95); border: 2px solid var(--p); border-radius: 20px; padding: 40px; width: 90%; max-width: 500px; box-shadow: 0 0 30px var(--p); text-align: center; }
+        h1 { font-family: 'Orbitron', sans-serif; color: var(--p-glow); text-shadow: 0 0 10px var(--p); letter-spacing: 3px; }
+        .package-list { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; }
+        .package-item {
+            background: #111; border: 1px solid #333; padding: 20px; border-radius: 10px; cursor: pointer;
+            transition: 0.4s; position: relative; overflow: hidden;
+        }
+        .package-item:hover { border-color: var(--p); box-shadow: 0 0 15px var(--p); transform: scale(1.02); }
+        .package-item.active { border-color: #fff; box-shadow: 0 0 20px #fff; background: rgba(188, 19, 254, 0.2); }
+        .package-item h3 { margin: 0; color: var(--p-glow); font-size: 22px; }
+        .btn-go {
+            width: 100%; padding: 18px; border: none; border-radius: 10px; background: var(--p); color: #fff;
+            font-family: 'Orbitron'; font-weight: bold; cursor: pointer; transition: 0.5s; box-shadow: 0 0 15px var(--p);
+        }
+        .btn-go:hover { background: #fff; color: var(--p); box-shadow: 0 0 25px #fff; }
     </style>
 </head>
 <body>
-    <h1>CHỌN GÓI KEY</h1>
-    <div class="btn-package" id="p1" onclick="select(1)"><h3>Gói 1 Ngày</h3><p>Miễn phí vượt link</p></div>
-    <div class="btn-package" id="p3" onclick="select(3)"><h3>Gói 3 Ngày</h3><p>Vượt link nhanh</p></div>
-    <div class="btn-package" id="p7" onclick="select(7)"><h3>Gói 7 Ngày</h3><p>Ưu tiên cao</p></div>
-    <br>
-    <button class="start-btn" onclick="go()">BẮT ĐẦU VƯỢT LINK</button>
+
+<div class="cyber-container">
+    <h1>SELECT PACKAGE</h1>
+    <div class="package-list">
+        <div class="package-item" onclick="selectPkg(1, this)">
+            <h3>GÓI 1 NGÀY</h3>
+            <p style="color: #888; margin: 5px 0 0;">Vượt 1 link - Free</p>
+        </div>
+        <div class="package-item" onclick="selectPkg(3, this)">
+            <h3>GÓI 3 NGÀY</h3>
+            <p style="color: #888; margin: 5px 0 0;">Ưu tiên - Free</p>
+        </div>
+        <div class="package-item" onclick="selectPkg(7, this)">
+            <h3>GÓI 7 NGÀY</h3>
+            <p style="color: #888; margin: 5px 0 0;">VIP - Free</p>
+        </div>
+    </div>
+    <button class="btn-go" onclick="startRedirect()">BẮT ĐẦU VƯỢT LINK</button>
+</div>
 
 <script>
     const firebaseConfig = {
@@ -32,26 +61,29 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let type = 0;
+    let selectedType = 0;
 
-    function select(d) {
-        type = d;
-        alert("Bạn đã chọn gói " + d + " ngày");
+    function selectPkg(days, el) {
+        selectedType = days;
+        document.querySelectorAll('.package-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
     }
 
-    function go() {
-        if(type === 0) return alert("Chọn gói đã!");
-        db.ref('settings/links').once('value', s => {
-            const links = s.val();
-            let url = "";
-            if(type === 1) url = links.d1;
-            if(type === 3) url = links.d3;
-            if(type === 7) url = links.d7;
+    function startRedirect() {
+        if(selectedType === 0) return Swal.fire('Nhắc nhở', 'Vui lòng chọn một gói!', 'warning');
+        
+        Swal.fire({ title: 'Đang lấy link...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-            if(url) {
-                localStorage.setItem("pendingKey", type);
-                window.location.href = url;
-            } else alert("Admin chưa cài link!");
+        db.ref('settings/links').once('value', s => {
+            const l = s.val();
+            let target = selectedType === 1 ? l.d1 : (selectedType === 3 ? l.d3 : l.d7);
+            
+            if(target) {
+                localStorage.setItem("pendingKeyType", selectedType);
+                window.location.href = target;
+            } else {
+                Swal.fire('Lỗi', 'Admin chưa cấu hình link này!', 'error');
+            }
         });
     }
 </script>

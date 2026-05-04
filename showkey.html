@@ -1,20 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Yoricks - Thành Công</title>
+    <meta charset="UTF-8">
+    <title>Yoricks - Success</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; text-align: center; padding-top: 100px; }
-        .key-box { border: 2px dashed #0f0; padding: 20px; display: inline-block; font-size: 24px; margin: 20px; }
+        :root { --p: #bc13fe; --bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .success-card { background: #111; border: 2px solid var(--p); padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px var(--p); width: 400px; }
+        .key-display { background: #000; border: 1px dashed var(--p); color: #fff; font-family: 'Orbitron'; font-size: 20px; padding: 20px; margin: 20px 0; word-break: break-all; text-shadow: 0 0 5px var(--p); }
+        .btn-copy { background: #fff; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 5px; font-family: 'Orbitron'; transition: 0.3s; }
+        .btn-copy:hover { background: var(--p); color: #fff; }
     </style>
 </head>
 <body>
-    <h1>VƯỢT LINK THÀNH CÔNG!</h1>
-    <p>Đây là Key của bạn (Hết hạn sau 24h nếu không dùng):</p>
-    <div class="key-box" id="final-key">Đang tạo...</div>
-    <br>
-    <button onclick="copy()" style="padding: 10px 20px; cursor:pointer;">COPY KEY</button>
+
+<div class="success-card">
+    <h1 style="color: var(--p);">THÀNH CÔNG!</h1>
+    <p>Hệ thống đã xác nhận. Key của bạn là:</p>
+    <div class="key-display" id="key-val">ĐANG TẠO...</div>
+    <button class="btn-copy" onclick="copyKey()">SAO CHÉP KEY</button>
+    <p style="margin-top: 20px; font-size: 13px; color: #555;">Quay lại trang chủ để kích hoạt ngay.</p>
+</div>
 
 <script>
     const firebaseConfig = {
@@ -30,18 +40,21 @@
     const db = firebase.database();
 
     window.onload = function() {
-        const d = localStorage.getItem("pendingKey") || 1;
-        const k = "YOR-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-        db.ref('keys/' + k).set({ duration: d, used: false }).then(() => {
-            document.getElementById('final-key').innerText = k;
-            localStorage.removeItem("pendingKey");
+        const type = localStorage.getItem("pendingKeyType") || 1;
+        const randomKey = "YOR-" + Math.random().toString(36).substring(2, 12).toUpperCase();
+        
+        db.ref('keys/' + randomKey).set({ duration: type, used: false })
+        .then(() => {
+            document.getElementById('key-val').innerText = randomKey;
+            localStorage.removeItem("pendingKeyType");
+            Swal.fire('Hoàn tất', 'Đã tạo mã key mới!', 'success');
         });
-    }
+    };
 
-    function copy() {
-        const t = document.getElementById('final-key').innerText;
-        navigator.clipboard.writeText(t);
-        alert("Đã copy!");
+    function copyKey() {
+        const k = document.getElementById('key-val').innerText;
+        navigator.clipboard.writeText(k);
+        Swal.fire('Đã Copy', 'Hãy dán vào trang chủ để dùng!', 'success');
     }
 </script>
 </body>
