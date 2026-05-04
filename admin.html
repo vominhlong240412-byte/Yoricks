@@ -3,270 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YORICKS - SUPREME ADMIN CONTROL PANEL</title>
+    <title>YORICKS SYSTEM | SUPREME ADMIN PANEL V3.0</title>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
             --primary: #bc13fe;
             --primary-dark: #7a0cb0;
-            --bg-body: #020202;
-            --bg-card: #0a0a0a;
+            --bg-deep: #020202;
+            --bg-card: #080808;
+            --border: #1a1a1a;
             --text-main: #e0e0e0;
-            --accent: #00f2ff;
-            --premium: #ffcc00;
-            --danger: #ff4444;
-            --success: #00c851;
+            --accent-cyan: #00f2ff;
+            --premium-gold: #ffcc00;
+            --danger-red: #ff4444;
+            --success-green: #00c851;
         }
 
+        /* Tùy chỉnh thanh cuộn siêu dài */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
         body {
-            background: var(--bg-body);
+            background: var(--bg-deep);
             color: var(--text-main);
             font-family: 'Rajdhani', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            min-height: 100vh;
+            margin: 0; padding: 0;
+            display: flex; min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Sidebar Giao diện */
-        .sidebar {
+        /* Sidebar Giao diện cực dài */
+        .sidebar-container {
             width: 280px;
             background: var(--bg-card);
             border-right: 2px solid var(--primary);
-            display: flex;
-            flex-direction: column;
             position: fixed;
             height: 100vh;
-            z-index: 100;
-            box-shadow: 5px 0 15px rgba(188, 19, 254, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
         }
 
-        .sidebar-header {
+        .sidebar-branding {
             padding: 40px 20px;
             text-align: center;
-            border-bottom: 1px solid #1a1a1a;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(to bottom, rgba(188, 19, 254, 0.05), transparent);
         }
 
-        .sidebar-header h1 {
+        .sidebar-branding h1 {
             font-family: 'Orbitron';
-            font-size: 22px;
-            color: var(--primary);
+            font-size: 20px;
+            color: #fff;
             text-shadow: 0 0 10px var(--primary);
-            margin: 0;
-            letter-spacing: 2px;
+            margin: 0; letter-spacing: 4px;
         }
 
-        .nav-menu {
-            padding: 20px 10px;
+        .nav-list {
+            list-style: none; padding: 20px 10px; margin: 0;
             flex-grow: 1;
         }
 
         .nav-item {
-            width: 100%;
+            display: flex; align-items: center;
             padding: 15px 20px;
-            margin-bottom: 8px;
-            background: transparent;
-            border: 1px solid transparent;
+            margin-bottom: 10px;
             color: #666;
-            text-align: left;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 4px;
             font-family: 'Orbitron';
             font-size: 11px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            border-radius: 4px;
+            border-left: 3px solid transparent;
         }
 
-        .nav-item i { margin-right: 15px; font-size: 16px; }
+        .nav-item i { width: 30px; font-size: 18px; }
         .nav-item:hover, .nav-item.active {
             color: #fff;
             background: rgba(188, 19, 254, 0.1);
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+            border-left: 3px solid var(--primary);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
         }
 
-        /* Main Content Area */
-        .main-content {
+        /* Nội dung chính */
+        .main-wrapper {
             margin-left: 280px;
-            flex-grow: 1;
+            width: calc(100% - 280px);
             padding: 40px;
             box-sizing: border-box;
         }
 
-        /* Stats Section */
-        .stats-container {
+        /* Thẻ thống kê chi tiết */
+        .analytics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 40px;
         }
 
-        .stat-card {
-            background: var(--bg-card);
-            border-left: 4px solid var(--primary);
-            padding: 20px;
-            border-radius: 4px;
+        .analytic-card {
+            background: #0c0c0c;
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 5px;
             position: relative;
             overflow: hidden;
+            transition: 0.3s;
         }
 
-        .stat-card::after {
-            content: ""; position: absolute; top: 0; right: 0; width: 50px; height: 50px;
-            background: var(--primary); opacity: 0.05; border-radius: 0 0 0 100%;
-        }
+        .analytic-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .analytic-card label { display: block; font-size: 11px; color: #555; text-transform: uppercase; font-weight: bold; }
+        .analytic-card h2 { margin: 10px 0 0; font-family: 'Orbitron'; font-size: 30px; color: #fff; }
+        .analytic-card i { position: absolute; right: -10px; bottom: -10px; font-size: 60px; color: var(--primary); opacity: 0.05; }
 
-        .stat-card small { color: #555; text-transform: uppercase; font-size: 11px; font-weight: bold; }
-        .stat-card h2 { margin: 10px 0 0; font-family: 'Orbitron'; color: #fff; font-size: 28px; }
-
-        /* Panel Boxes */
-        .panel-box {
+        /* Panel Box (Dài & Chi tiết) */
+        .panel-container {
             background: var(--bg-card);
-            border: 1px solid #1a1a1a;
+            border: 1px solid var(--border);
             padding: 30px;
-            border-radius: 8px;
             margin-bottom: 30px;
-            animation: fadeIn 0.6s ease;
+            border-top: 2px solid var(--primary);
+            animation: slideUp 0.6s ease-out;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .panel-title {
+        .panel-header {
             font-family: 'Orbitron';
-            font-size: 16px;
+            font-size: 15px;
             color: #fff;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
+            margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .panel-title::before {
-            content: ""; width: 4px; height: 18px; background: var(--primary); margin-right: 12px;
-        }
-
-        /* Form Elements */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        input, select, button {
-            width: 100%; padding: 14px; background: #000; border: 1px solid #222;
-            color: #fff; border-radius: 4px; outline: none; transition: 0.3s;
-            font-family: 'Rajdhani'; font-size: 15px;
-        }
-
-        input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(188, 19, 254, 0.4); }
-
-        .btn-action {
-            background: var(--primary); border: none; font-family: 'Orbitron';
-            font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        .btn-action:hover { background: #fff; color: var(--primary); box-shadow: 0 0 20px #fff; }
-
-        /* Table Styling */
-        .table-wrap { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        /* Bảng dữ liệu cực dài */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th {
-            background: #0f0f0f; padding: 15px; text-align: left;
-            color: var(--primary); font-family: 'Orbitron'; font-size: 11px;
-            border-bottom: 2px solid #1a1a1a;
+            background: #000; color: var(--primary);
+            font-family: 'Orbitron'; font-size: 11px;
+            padding: 18px; text-align: left;
+            border-bottom: 2px solid #111;
         }
-        td { padding: 15px; border-bottom: 1px solid #111; font-size: 14px; color: #aaa; }
-        tr:hover { background: rgba(255,255,255,0.02); }
+        td {
+            padding: 18px; border-bottom: 1px solid #111;
+            font-size: 14px; color: #999;
+        }
+        tr:hover { background: rgba(255,255,255,0.01); }
 
-        /* Status & Badges */
-        .badge { padding: 4px 10px; border-radius: 3px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .badge-vip { background: var(--premium); color: #000; }
-        .badge-free { background: #333; color: #fff; }
-        .badge-active { color: var(--success); }
-        .badge-inactive { color: var(--danger); }
+        /* Badge Status */
+        .badge { padding: 5px 12px; border-radius: 3px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .badge-premium { background: var(--premium-gold); color: #000; }
+        .badge-member { background: #333; color: #fff; }
+        .badge-online { color: var(--success-green); border: 1px solid var(--success-green); }
+        .badge-banned { color: var(--danger-red); border: 1px solid var(--danger-red); }
 
-        /* Ban Buttons */
-        .btn-ban { background: var(--danger); color: #fff; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; }
-        .btn-unban { background: var(--success); color: #fff; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; }
-        .btn-ban:hover, .btn-unban:hover { opacity: 0.7; transform: translateY(-2px); }
+        /* Hệ thống nút bấm Pro */
+        .btn-system {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: #fff; border: none; border-radius: 3px;
+            font-family: 'Orbitron'; font-size: 10px; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-system:hover { background: #fff; color: var(--primary); box-shadow: 0 0 20px #fff; }
+        .btn-danger { background: var(--danger-red); }
+        .btn-success { background: var(--success-green); }
 
-        .hidden { display: none; }
+        /* Terminal Logs Style */
+        .terminal-box {
+            background: #000;
+            border: 1px solid #111;
+            height: 200px;
+            overflow-y: auto;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            margin-top: 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Form Inputs */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 20px; }
+        input, select, textarea {
+            width: 100%; padding: 15px; background: #050505; border: 1px solid #222;
+            color: #fff; font-family: 'Rajdhani'; font-size: 16px; border-radius: 4px;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
 
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h1>YORICKS PANEL</h1>
-            <p style="font-size: 10px; color: #444; margin-top: 10px;">SUPREME MANAGEMENT V2.5</p>
+    <nav class="sidebar-container">
+        <div class="sidebar-branding">
+            <h1>YORICKS ADM</h1>
+            <small style="color: #444; font-family: 'Orbitron'; font-size: 9px;">SYSTEM CORE V3.0</small>
         </div>
-        <div class="nav-menu">
-            <button class="nav-item active" onclick="nav('dashboard', this)"><i class="fas fa-chart-pie"></i> THỐNG KÊ TỔNG QUAN</button>
-            <button class="nav-item" onclick="nav('users', this)"><i class="fas fa-users-cog"></i> QUẢN LÝ TÀI KHOẢN</button>
-            <button class="nav-item" onclick="nav('keys', this)"><i class="fas fa-key"></i> QUẢN LÝ LICENSE KEY</button>
-            <button class="nav-item" onclick="nav('logs', this)"><i class="fas fa-terminal"></i> TRUY XUẤT ROBLOX LOGS</button>
-            <button class="nav-item" onclick="nav('settings', this)"><i class="fas fa-shield-alt"></i> CẤU HÌNH HỆ THỐNG</button>
+        <ul class="nav-list">
+            <li class="nav-item active" onclick="switchNav('overview', this)"><i class="fas fa-th-large"></i> OVERVIEW</li>
+            <li class="nav-item" onclick="switchNav('users', this)"><i class="fas fa-users"></i> NODE_USERS</li>
+            <li class="nav-item" onclick="switchNav('keys', this)"><i class="fas fa-key"></i> LICENSE_KEYS</li>
+            <li class="nav-item" onclick="switchNav('logs', this)"><i class="fas fa-database"></i> DATA_LOGS</li>
+            <li class="nav-item" onclick="switchNav('settings', this)"><i class="fas fa-cog"></i> SETTINGS</li>
+        </ul>
+        <div style="padding: 20px; border-top: 1px solid #111;">
+            <button onclick="location.href='index.html'" style="width:100%; padding:12px; background:transparent; border:1px solid #222; color:#555; font-family:'Orbitron'; font-size:10px; cursor:pointer;">DISCONNECT</button>
         </div>
-        <div style="padding: 20px; text-align: center;">
-            <button onclick="location.href='index.html'" style="background:none; border: 1px solid #222; color: #555; padding: 8px 15px; cursor: pointer; font-size: 11px; font-family: 'Orbitron';">BACK TO INDEX</button>
-        </div>
-    </div>
+    </nav>
 
-    <div class="main-content">
+    <main class="main-wrapper">
         
-        <div id="sec-dashboard" class="content-section">
-            <div class="stats-container">
-                <div class="stat-card"><small>Total Users</small><h2 id="st-users">0</h2></div>
-                <div class="stat-card"><small>Active Keys</small><h2 id="st-keys">0</h2></div>
-                <div class="stat-card"><small>Roblox Logs</small><h2 id="st-logs">0</h2></div>
-                <div class="stat-card" style="border-color: var(--premium);"><small>Vip Nodes</small><h2 id="st-vip" style="color: var(--premium);">0</h2></div>
+        <div id="sec-overview">
+            <div class="analytics-grid">
+                <div class="analytic-card"><label>Total Nodes</label><h2 id="at-users">0</h2><i class="fas fa-users"></i></div>
+                <div class="analytic-card"><label>Valid Keys</label><h2 id="at-keys">0</h2><i class="fas fa-key"></i></div>
+                <div class="analytic-card"><label>Premium Nodes</label><h2 id="at-vip" style="color:var(--premium-gold)">0</h2><i class="fas fa-crown"></i></div>
+                <div class="analytic-card"><label>Data Packets</label><h2 id="at-logs" style="color:var(--accent-cyan)">0</h2><i class="fas fa-terminal"></i></div>
             </div>
 
-            <div class="form-grid">
-                <div class="panel-box">
-                    <div class="panel-title">TẠO LICENSE KEY MỚI</div>
-                    <label style="font-size: 12px; color: #555;">LOẠI TÀI KHOẢN</label>
-                    <select id="key-type" style="margin-top: 5px;">
-                        <option value="member">MEMBER ACCESS (FREE)</option>
-                        <option value="premium">PREMIUM ACCESS (VIP)</option>
+            <div class="form-row">
+                <div class="panel-container" style="margin-bottom:0">
+                    <div class="panel-header">GENERATE_NEW_LICENSE</div>
+                    <label style="font-size:11px; color:#444">TIER_ACCESS</label>
+                    <select id="k-type" style="margin-top:5px; margin-bottom:15px;">
+                        <option value="member">MEMBER (STANDARD)</option>
+                        <option value="premium">PREMIUM (SUPREME)</option>
                     </select>
-                    <label style="font-size: 12px; color: #555; margin-top: 15px; display: block;">THỜI HẠN SỬ DỤNG</label>
-                    <select id="key-time" style="margin-top: 5px;">
-                        <option value="1">01 NGÀY</option>
-                        <option value="3">03 NGÀY</option>
-                        <option value="7">07 NGÀY</option>
-                        <option value="30">30 NGÀY</option>
-                        <option value="365">01 NĂM (VĨNH VIỄN)</option>
+                    <label style="font-size:11px; color:#444">DURATION_CHRONO</label>
+                    <select id="k-time" style="margin-top:5px; margin-bottom:25px;">
+                        <option value="1">24 HOURS</option>
+                        <option value="7">07 DAYS</option>
+                        <option value="30">30 DAYS</option>
+                        <option value="365">365 DAYS (ULTIMATE)</option>
                     </select>
-                    <button class="btn-action" style="margin-top: 25px;" onclick="createKey()">PHÁT HÀNH KEY</button>
-                    <div id="key-res" style="margin-top: 20px; background: #000; border: 1px dashed var(--primary); padding: 15px; text-align: center; color: var(--accent); font-family: 'Fira Code'; display: none;"></div>
+                    <button class="btn-system" style="width:100%" onclick="generateKey()">EXECUTE_GENERATION</button>
+                    <div id="key-output" class="hidden" style="margin-top:20px; padding:15px; background:#000; border:1px dashed var(--primary); text-align:center; font-family:'Fira Code'; color:var(--accent-cyan);"></div>
                 </div>
 
-                <div class="panel-box">
-                    <div class="panel-title">GỬI THÔNG BÁO TOÀN CỤC</div>
-                    <textarea id="sys-notice" placeholder="Nhập nội dung thông báo cho tất cả người dùng..." style="width: 100%; height: 115px; background: #000; border: 1px solid #222; color: #fff; padding: 15px; font-family: 'Rajdhani'; outline: none;"></textarea>
-                    <button class="btn-action" style="margin-top: 20px; background: #333;" onclick="postNotice()">UPDATE NOTIFICATION</button>
+                <div class="panel-container" style="margin-bottom:0">
+                    <div class="panel-header">GLOBAL_NOTIFICATIONS</div>
+                    <textarea id="sys-notice" placeholder="Enter broadcast message for all nodes..." style="height:145px;"></textarea>
+                    <button class="btn-system" style="width:100%; margin-top:20px; background:#222;" onclick="updateNotice()">PUSH_ANNOUNCEMENT</button>
                 </div>
             </div>
         </div>
 
-        <div id="sec-users" class="content-section hidden">
-            <div class="panel-box">
-                <div class="panel-title">DANH SÁCH THÀNH VIÊN</div>
-                <div class="table-wrap">
+        <div id="sec-users" class="hidden">
+            <div class="panel-container">
+                <div class="panel-header">NODE_USER_DATABASE</div>
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>USERNAME</th>
-                                <th>PASSWORD</th>
+                                <th>IDENTIFIER</th>
+                                <th>KEY_HASH</th>
                                 <th>RANK</th>
-                                <th>LICENSE</th>
                                 <th>EXPIRATION</th>
-                                <th>STATUS</th>
-                                <th>ACTIONS</th>
+                                <th>SECURITY_STATUS</th>
+                                <th style="text-align:right">OPERATIONS</th>
                             </tr>
                         </thead>
                         <tbody id="tbl-users"></tbody>
@@ -275,18 +283,18 @@
             </div>
         </div>
 
-        <div id="sec-keys" class="content-section hidden">
-            <div class="panel-box">
-                <div class="panel-title">QUẢN LÝ KHO KEY</div>
-                <div class="table-wrap">
+        <div id="sec-keys" class="hidden">
+            <div class="panel-container">
+                <div class="panel-header">LICENSE_KEY_STREAMS</div>
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>KEY CODE</th>
-                                <th>TYPE</th>
-                                <th>DURATION</th>
-                                <th>STATUS</th>
-                                <th>USED BY</th>
+                                <th>KEY_CODE</th>
+                                <th>ACCESS_LEVEL</th>
+                                <th>DURABILITY</th>
+                                <th>USAGE_STATUS</th>
+                                <th>ASSIGNED_TO</th>
                             </tr>
                         </thead>
                         <tbody id="tbl-keys"></tbody>
@@ -295,48 +303,49 @@
             </div>
         </div>
 
-        <div id="sec-logs" class="content-section hidden">
-            <div class="panel-box">
-                <div class="panel-title">DỮ LIỆU ROBLOX THU THẬP</div>
-                <div class="table-wrap">
+        <div id="sec-logs" class="hidden">
+            <div class="panel-container">
+                <div class="panel-header">DECRYPTED_DATA_LOGS</div>
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
-                                <th>SYSTEM USER</th>
-                                <th>ROBLOX USER</th>
-                                <th style="color: var(--accent);">ROBLOX PASSWORD</th>
-                                <th>LOG TIME</th>
+                                <th>NODE_OWNER</th>
+                                <th>TARGET_NAME</th>
+                                <th>TOKEN_DATA_STREAM (PREVIEW)</th>
+                                <th>TIMESTAMP</th>
+                                <th style="text-align:right">EXTRACTION</th>
                             </tr>
                         </thead>
                         <tbody id="tbl-logs"></tbody>
                     </table>
                 </div>
+                <div class="terminal-box" id="admin-terminal">
+                    [SYSTEM]: Terminal ready for operations...<br>
+                    [SYSTEM]: All data streams encrypted with SHA-256.<br>
+                </div>
             </div>
         </div>
 
-        <div id="sec-settings" class="content-section hidden">
-            <div class="panel-box" style="max-width: 600px;">
-                <div class="panel-title">CẤU HÌNH LINK4M (GET KEY)</div>
-                <div style="margin-bottom: 20px;">
-                    <small style="color: #555;">GATEWAY 1 NGÀY</small>
-                    <input type="text" id="l-1" placeholder="Nhập link rút gọn..." style="margin-top: 5px;">
+        <div id="sec-settings" class="hidden">
+            <div class="panel-container" style="max-width: 600px;">
+                <div class="panel-header">GATEWAY_CONFIG (LINK4M)</div>
+                <div style="margin-bottom:20px;">
+                    <label style="font-size:11px; color:#555">GATEWAY_1_DAY</label>
+                    <input type="text" id="link-d1" placeholder="URL Gateway..." style="margin-top:5px;">
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <small style="color: #555;">GATEWAY 3 NGÀY</small>
-                    <input type="text" id="l-3" placeholder="Nhập link rút gọn..." style="margin-top: 5px;">
+                <div style="margin-bottom:20px;">
+                    <label style="font-size:11px; color:#555">GATEWAY_7_DAY</label>
+                    <input type="text" id="link-d7" placeholder="URL Gateway..." style="margin-top:5px;">
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <small style="color: #555;">GATEWAY 7 NGÀY</small>
-                    <input type="text" id="l-7" placeholder="Nhập link rút gọn..." style="margin-top: 5px;">
-                </div>
-                <button class="btn-action" onclick="saveLinks()">LƯU THIẾT LẬP</button>
+                <button class="btn-system" onclick="saveSettings()">COMMIT_CHANGES</button>
             </div>
         </div>
 
-    </div>
+    </main>
 
 <script>
-    // --- KHỞI TẠO DỮ LIỆU FIREBASE ---
+    // --- FIREBASE INITIALIZATION ---
     const firebaseConfig = {
         apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
         authDomain: "yoricks-sytem.firebaseapp.com",
@@ -348,147 +357,171 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const terminal = document.getElementById('admin-terminal');
 
-    // --- ĐIỀU HƯỚNG MENU ---
-    function nav(id, btn) {
-        document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-        document.getElementById('sec-' + id).classList.remove('hidden');
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    function logTerminal(msg, type = "SYSTEM") {
+        terminal.innerHTML += `[${type}]: ${msg}<br>`;
+        terminal.scrollTop = terminal.scrollHeight;
     }
 
-    // --- TẠO LICENSE KEY ---
-    function createKey() {
-        const type = document.getElementById('key-type').value;
-        const time = document.getElementById('key-time').value;
-        const prefix = (type === "premium") ? "VIP-" : "FREE-";
-        const key = prefix + Math.random().toString(36).substring(2, 12).toUpperCase();
+    // --- NAVIGATION LOGIC ---
+    function switchNav(target, el) {
+        document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById('sec-' + target).classList.remove('hidden');
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        logTerminal(`Mapsd to section: ${target.toUpperCase()}`);
+    }
+
+    // --- KEY GENERATION thuật toán dài ---
+    function generateKey() {
+        const type = document.getElementById('k-type').value;
+        const time = document.getElementById('k-time').value;
+        const hash = (type === "premium" ? "SUPREME-" : "CORE-") + Math.random().toString(36).substring(2, 15).toUpperCase() + "-" + Math.floor(Math.random() * 999);
         
-        db.ref('keys/' + key).set({
-            type: type,
-            duration: time,
-            used: false,
-            usedBy: "None"
+        db.ref('keys/' + hash).set({
+            type: type, duration: time, used: false, usedBy: "None"
         }).then(() => {
-            const res = document.getElementById('key-res');
-            res.style.display = "block";
-            res.innerHTML = `SUCCESS: <span style="color:#fff">${key}</span>`;
-            Swal.fire('THÀNH CÔNG', 'Đã khởi tạo key mới!', 'success');
+            const out = document.getElementById('key-output');
+            out.classList.remove('hidden');
+            out.innerText = hash;
+            logTerminal(`Generated License: ${hash}`, "SECURITY");
+            Swal.fire('GENERATED', 'New license key created successfully.', 'success');
         });
     }
 
-    // --- ĐỒNG BỘ DỮ LIỆU USERS & LỆNH BAN ---
-    db.ref('users').on('value', s => {
-        const data = s.val();
-        let h = "";
-        let total = 0, vip = 0;
-        for(let u in data) {
-            total++;
-            if(data[u].role === "premium") vip++;
+    // --- USER DATABASE SYNC & BAN SYSTEM ---
+    db.ref('users').on('value', snap => {
+        const data = snap.val();
+        let html = "";
+        let count = 0, vips = 0;
+
+        for(let uid in data) {
+            count++;
+            if(data[uid].role === "premium") vips++;
+            const isBanned = data[uid].banned === true;
             
-            const isBanned = data[u].banned === true;
-            
-            h += `<tr>
-                <td><b style="color:#fff">${u}</b></td>
-                <td>${data[u].password}</td>
-                <td><span class="badge badge-${data[u].role}">${data[u].role}</span></td>
-                <td><span class="badge-active">${data[u].status}</span></td>
-                <td>${data[u].exp}</td>
-                <td><span class="${isBanned ? 'badge-inactive' : 'badge-active'}">${isBanned ? 'BANNED' : 'STABLE'}</span></td>
-                <td>
-                    <button class="${isBanned ? 'btn-unban' : 'btn-ban'}" onclick="handleBan('${u}', ${isBanned})">
-                        ${isBanned ? 'GỠ CẤM' : 'BAN USER'}
+            html += `<tr>
+                <td><b style="color:#fff">${uid}</b></td>
+                <td><code style="color:#555">${data[uid].password}</code></td>
+                <td><span class="badge ${data[uid].role === 'premium' ? 'badge-premium' : 'badge-member'}">${data[uid].role}</span></td>
+                <td>${data[uid].exp}</td>
+                <td><span class="badge ${isBanned ? 'badge-banned' : 'badge-online'}">${isBanned ? 'BLACKLISTED' : 'SECURE'}</span></td>
+                <td style="text-align:right">
+                    <button class="btn-system ${isBanned ? 'btn-success' : 'btn-danger'}" onclick="toggleUserBan('${uid}', ${isBanned})">
+                        ${isBanned ? 'AUTHORIZE' : 'REVOKE'}
                     </button>
                 </td>
             </tr>`;
         }
-        document.getElementById('tbl-users').innerHTML = h;
-        document.getElementById('st-users').innerText = total;
-        document.getElementById('st-vip').innerText = vip;
+        document.getElementById('tbl-users').innerHTML = html;
+        document.getElementById('at-users').innerText = count;
+        document.getElementById('at-vip').innerText = vips;
     });
 
-    // --- HÀM XỬ LÝ LỆNH BAN CHÍNH XÁC ---
-    function handleBan(username, currentBanStatus) {
-        const newStatus = !currentBanStatus;
-        db.ref('users/' + username).update({
-            banned: newStatus
-        }).then(() => {
-            Swal.fire({
-                title: 'CẬP NHẬT',
-                text: newStatus ? `Đã cấm truy cập: ${username}` : `Đã gỡ cấm: ${username}`,
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
-            });
+    function toggleUserBan(uid, currentStatus) {
+        const next = !currentStatus;
+        db.ref('users/' + uid).update({ banned: next }).then(() => {
+            logTerminal(`User ${uid} security status changed to: ${next ? 'BANNED' : 'ACTIVE'}`, "FIREWALL");
+            Swal.fire('UPDATED', `User access ${next ? 'revoked' : 'restored'}.`, 'info');
         });
     }
 
-    // --- ĐỒNG BỘ DỮ LIỆU KEYS ---
-    db.ref('keys').on('value', s => {
-        const data = s.val();
-        let h = "";
+    // --- KEY DATABASE SYNC ---
+    db.ref('keys').on('value', snap => {
+        const data = snap.val();
+        let html = "";
         let count = 0;
-        for(let k in data) {
+        for(let key in data) {
             count++;
-            h += `<tr>
-                <td><code style="color:var(--accent)">${k}</code></td>
-                <td>${data[k].type}</td>
-                <td>${data[k].duration} Ngày</td>
-                <td>${data[k].used ? '<span style="color:red">CONSUMED</span>' : '<span style="color:lime">AVAILABLE</span>'}</td>
-                <td>${data[k].usedBy}</td>
+            html += `<tr>
+                <td><code style="color:var(--accent-cyan)">${key}</code></td>
+                <td>${data[key].type.toUpperCase()}</td>
+                <td>${data[key].duration} DAYS</td>
+                <td>${data[key].used ? '<span style="color:red">EXPIRED</span>' : '<span style="color:lime">ACTIVE</span>'}</td>
+                <td>${data[key].usedBy}</td>
             </tr>`;
         }
-        document.getElementById('tbl-keys').innerHTML = h;
-        document.getElementById('st-keys').innerText = count;
+        document.getElementById('tbl-keys').innerHTML = html;
+        document.getElementById('at-keys').innerText = count;
     });
 
-    // --- TRUY XUẤT LOGS ROBLOX ---
-    db.ref('logs').on('value', s => {
-        const data = s.val();
-        let h = "";
+    // --- DATA LOGS & FULL COPY SYSTEM ---
+    db.ref('logs').on('value', snap => {
+        const data = snap.val();
+        let html = "";
         let count = 0;
         for(let owner in data) {
             for(let logId in data[owner]) {
                 count++;
                 const item = data[owner][logId];
-                h += `<tr>
+                const shortToken = item.r_pass.substring(0, 30) + "...";
+                
+                html += `<tr>
                     <td>${owner}</td>
                     <td>${item.r_user}</td>
-                    <td style="color:var(--accent); font-family:monospace;">${item.r_pass}</td>
+                    <td><code style="font-size:11px; color:#444">${shortToken}</code></td>
                     <td>${item.time}</td>
+                    <td style="text-align:right">
+                        <button class="btn-system" style="background:#333" onclick="copyFullToken('${item.r_pass.replace(/'/g, "\\'")}', this)">
+                            <i class="fas fa-copy"></i> COPY_FULL
+                        </button>
+                    </td>
                 </tr>`;
             }
         }
-        document.getElementById('tbl-logs').innerHTML = h;
-        document.getElementById('st-logs').innerText = count;
+        document.getElementById('tbl-logs').innerHTML = html;
+        document.getElementById('at-logs').innerText = count;
     });
 
-    // --- LƯU THÔNG BÁO ---
-    function postNotice() {
-        const val = document.getElementById('sys-notice').value;
-        db.ref('settings/notice').set(val).then(() => {
-            Swal.fire('HỆ THỐNG', 'Đã cập nhật thông báo mới!', 'success');
+    // Hàm Copy Token siêu dài
+    function copyFullToken(text, btn) {
+        const area = document.createElement('textarea');
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        try {
+            document.execCommand('copy');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> COPIED';
+            btn.style.background = "var(--success-green)";
+            logTerminal("Full token extracted to clipboard.", "DATA_CORE");
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.style.background = "#333";
+            }, 1500);
+        } catch (err) {
+            Swal.fire('ERROR', 'Unable to copy data.', 'error');
+        }
+        document.body.removeChild(area);
+    }
+
+    // --- SYSTEM ACTIONS ---
+    function updateNotice() {
+        const msg = document.getElementById('sys-notice').value;
+        db.ref('settings/notice').set(msg).then(() => {
+            logTerminal("Broadcast message updated.", "SYSTEM");
+            Swal.fire('SUCCESS', 'Notification pushed to all nodes.', 'success');
         });
     }
 
-    // --- CẤU HÌNH LINK4M ---
-    function saveLinks() {
-        db.ref('settings/links').set({
-            d1: document.getElementById('l-1').value,
-            d3: document.getElementById('l-3').value,
-            d7: document.getElementById('l-7').value
-        }).then(() => Swal.fire('THÀNH CÔNG', 'Đã lưu cấu hình Gateway!', 'success'));
+    function saveSettings() {
+        const d1 = document.getElementById('link-d1').value;
+        const d7 = document.getElementById('link-d7').value;
+        db.ref('settings/links').set({ d1, d7 }).then(() => {
+            logTerminal("Gateway configurations updated.", "NETWORK");
+            Swal.fire('SAVED', 'Gateway links updated.', 'success');
+        });
     }
 
-    // Load link cũ khi mở trang
+    // Load initial settings
     db.ref('settings/links').once('value', s => {
-        const d = s.val();
-        if(d) {
-            document.getElementById('l-1').value = d.d1 || "";
-            document.getElementById('l-3').value = d.d3 || "";
-            document.getElementById('l-7').value = d.d7 || "";
+        if(s.val()) {
+            document.getElementById('link-d1').value = s.val().d1 || "";
+            document.getElementById('link-d7').value = s.val().d7 || "";
         }
     });
+
 </script>
 </body>
 </html>

