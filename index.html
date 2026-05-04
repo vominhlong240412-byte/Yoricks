@@ -3,40 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoricks - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Yoricks - Cyber System</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #007bff; --dark: #0056b3; --bg: #f4f7f9; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
-        h2 { color: var(--blue); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; background: var(--blue); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: var(--dark); }
-        .logout { background: #dc3545; margin-top: 10px; }
-        .link { color: var(--blue); cursor: pointer; font-size: 13px; display: block; margin-top: 10px; }
+        :root { --p: #bc13fe; --p-glow: #e2a9ff; --bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; overflow-x: hidden; }
+        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: radial-gradient(circle, #1a0033 0%, #050505 100%); }
+        
+        .cyber-card {
+            background: rgba(20, 20, 20, 0.9); border: 2px solid var(--p); border-radius: 15px; padding: 40px; width: 400px;
+            box-shadow: 0 0 20px var(--p), inset 0 0 10px var(--p); position: relative; text-align: center;
+        }
+        .cyber-card::before { content: ""; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border: 1px solid var(--p-glow); border-radius: 18px; opacity: 0.3; pointer-events: none; }
+
+        h2 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 5px; color: var(--p-glow); text-shadow: 0 0 10px var(--p); }
+        
+        input {
+            width: 100%; background: #000; border: 1px solid var(--p); padding: 12px; margin: 15px 0; color: #fff;
+            border-radius: 5px; outline: none; font-family: 'Rajdhani'; transition: 0.3s;
+        }
+        input:focus { box-shadow: 0 0 15px var(--p); }
+
+        .btn {
+            width: 100%; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron';
+            font-weight: bold; text-transform: uppercase; transition: 0.5s; margin-top: 10px;
+        }
+        .btn-primary { background: var(--p); color: white; box-shadow: 0 0 10px var(--p); }
+        .btn-primary:hover { background: #fff; color: var(--p); box-shadow: 0 0 20px #fff; }
+        
+        .btn-outline { background: transparent; border: 1px solid var(--p); color: var(--p); margin-top: 20px; }
+        .btn-outline:hover { background: rgba(188, 19, 254, 0.1); }
+
+        .status-box { border-left: 5px solid var(--p); background: #111; padding: 15px; margin: 20px 0; text-align: left; }
+        .status-box b { color: var(--p-glow); }
+        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="card" id="auth-card">
-    <h2 id="title">Đăng Nhập</h2>
-    <input type="text" id="user" placeholder="Tài khoản">
-    <input type="password" id="pass" placeholder="Mật khẩu">
-    <button class="btn" onclick="handleAuth()">Xác Nhận</button>
-    <span class="link" onclick="toggle()">Chưa có tài khoản? Đăng ký</span>
-</div>
+<div class="container">
+    <div class="cyber-card" id="auth-section">
+        <h2 id="form-title">Login</h2>
+        <div id="auth-inputs">
+            <input type="text" id="username" placeholder="USERNAME">
+            <input type="password" id="password" placeholder="PASSWORD">
+            <button class="btn btn-primary" onclick="handleAuth()">Xác Nhận</button>
+        </div>
+        <p style="font-size: 14px; margin-top: 20px; cursor: pointer; color: #888;" onclick="toggleAuth()" id="toggle-text">
+            Chưa có tài khoản? <span style="color: var(--p);">ĐĂNG KÝ</span>
+        </p>
+    </div>
 
-<div class="card" id="main-card" style="display:none;">
-    <h2>Yoricks Panel</h2>
-    <p>Trạng thái: <b id="st-text" style="color:red">Chưa kích hoạt</b></p>
-    <p>Hạn dùng: <b id="exp-text">N/A</b></p>
-    <hr>
-    <input type="text" id="key-input" placeholder="Nhập Key tại đây">
-    <button class="btn" onclick="activate()">Kích Hoạt Key</button>
-    <button class="btn logout" onclick="logout()">Đăng Xuất</button>
+    <div class="cyber-card hidden" id="main-section">
+        <h2>Dashboard</h2>
+        <div class="status-box">
+            <div>User: <b id="display-user">...</b></div>
+            <div>Trạng thái: <b id="key-status">Chưa kích hoạt</b></div>
+            <div>Hết hạn: <b id="key-expiry">N/A</b></div>
+        </div>
+        
+        <input type="text" id="activation-key" placeholder="NHẬP KEY TẠI ĐÂY">
+        <button class="btn btn-primary" onclick="activateKey()">KÍCH HOẠT NGAY</button>
+        
+        <button class="btn btn-outline" onclick="location.href='getkey.html'">LẤY KEY MIỄN PHÍ</button>
+        
+        <button class="btn" style="background: #333; color: #888; margin-top: 20px;" onclick="logout()">LOGOUT</button>
+    </div>
 </div>
 
 <script>
@@ -51,50 +87,62 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let isLogin = true;
+    let isLoginMode = true;
 
-    function toggle() {
-        isLogin = !isLogin;
-        document.getElementById('title').innerText = isLogin ? "Đăng Nhập" : "Đăng Ký";
+    function toggleAuth() {
+        isLoginMode = !isLoginMode;
+        document.getElementById('form-title').innerText = isLoginMode ? "Login" : "Register";
+        document.getElementById('toggle-text').innerHTML = isLoginMode ? 
+            'Chưa có tài khoản? <span style="color: var(--p);">ĐĂNG KÝ</span>' : 
+            'Đã có tài khoản? <span style="color: var(--p);">ĐĂNG NHẬP</span>';
     }
 
     function handleAuth() {
-        const u = document.getElementById('user').value;
-        const p = document.getElementById('pass').value;
-        if(!u || !p) return alert("Điền đủ thông tin!");
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        if(!u || !p) return Swal.fire('Lỗi', 'Không được để trống!', 'error');
 
-        if(!isLogin) {
+        if(!isLoginMode) {
             db.ref('users/' + u).set({ password: p, status: "Chưa kích hoạt", exp: "N/A", banned: false })
-            .then(() => alert("Đăng ký xong!"));
+            .then(() => {
+                Swal.fire('Thành công', 'Đăng ký hoàn tất! Hãy đăng nhập.', 'success');
+                toggleAuth();
+            });
         } else {
             db.ref('users/' + u).once('value', s => {
                 if(s.exists() && s.val().password === p) {
-                    if(s.val().banned) return alert("Bạn đã bị BAN!");
+                    if(s.val().banned) return Swal.fire('Bị khóa', 'Tài khoản bạn đã bị BAN!', 'error');
                     localStorage.setItem("user", u);
-                    showPanel(s.val());
-                } else alert("Sai tài khoản/mật khẩu!");
+                    loadPanel(s.val(), u);
+                    Swal.fire('Chào mừng', 'Đăng nhập thành công!', 'success');
+                } else {
+                    Swal.fire('Lỗi', 'Sai tài khoản hoặc mật khẩu!', 'error');
+                }
             });
         }
     }
 
-    function showPanel(data) {
-        document.getElementById('auth-card').style.display = 'none';
-        document.getElementById('main-card').style.display = 'block';
-        document.getElementById('st-text').innerText = data.status;
-        document.getElementById('exp-text').innerText = data.exp;
-        if(data.status === "Đã kích hoạt") document.getElementById('st-text').style.color = "green";
+    function loadPanel(data, u) {
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('main-section').classList.remove('hidden');
+        document.getElementById('display-user').innerText = u;
+        document.getElementById('key-status').innerText = data.status;
+        document.getElementById('key-expiry').innerText = data.exp;
     }
 
-    function activate() {
-        const k = document.getElementById('key-input').value;
+    function activateKey() {
+        const k = document.getElementById('activation-key').value;
         const u = localStorage.getItem("user");
+        if(!k) return Swal.fire('Nhắc nhở', 'Vui lòng nhập Key!', 'warning');
+
         db.ref('keys/' + k).once('value', s => {
             if(s.exists() && !s.val().used) {
                 db.ref('users/' + u).update({ status: "Đã kích hoạt", exp: s.val().duration + " ngày" });
                 db.ref('keys/' + k).update({ used: true, usedBy: u });
-                alert("Kích hoạt thành công!");
-                location.reload();
-            } else alert("Key sai hoặc đã dùng!");
+                Swal.fire('Tuyệt vời', 'Kích hoạt thành công!', 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Lỗi', 'Key không tồn tại hoặc đã dùng!', 'error');
+            }
         });
     }
 

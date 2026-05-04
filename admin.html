@@ -1,38 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Yoricks</title>
+    <title>Admin - Yoricks Master</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
-        body { background: #0b1e3b; color: white; font-family: sans-serif; padding: 20px; }
-        .box { max-width: 500px; margin: auto; background: #162a4a; padding: 20px; border-radius: 10px; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { background: #007bff; color: white; font-weight: bold; cursor: pointer; }
+        body { background: #050505; color: #bc13fe; font-family: sans-serif; padding: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #bc13fe; }
+        button { background: #bc13fe; cursor: pointer; font-weight: bold; }
+        table { width: 100%; margin-top: 10px; color: white; font-size: 12px; }
+        th { text-align: left; color: #bc13fe; }
     </style>
 </head>
 <body>
-<div id="lock" style="text-align:center; padding-top:100px;">
-    <input type="password" id="ad-p" placeholder="Mật khẩu Admin">
-    <button onclick="check()">Vào Admin</button>
-</div>
+    <h1 style="text-align: center;">YORICKS ADMIN SYSTEM</h1>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>Tạo Key Mới</h3>
+            <select id="k-days"><option value="1">1 Ngày</option><option value="3">3 Ngày</option><option value="7">7 Ngày</option></select>
+            <button onclick="genKey()">GIAO KEY</button>
+            <div id="new-key" style="margin-top:10px; font-weight:bold; color:white;"></div>
+        </div>
 
-<div class="box" id="content" style="display:none;">
-    <h2>Quản Trị Key</h2>
-    <select id="days">
-        <option value="1">1 Ngày</option>
-        <option value="3">3 Ngày</option>
-        <option value="7">7 Ngày</option>
-    </select>
-    <button onclick="gen()">Tạo Key</button>
-    <p id="res" style="color: lime;"></p>
-    <hr>
-    <h3>Link GetKey (Link4M)</h3>
-    <input type="text" id="l1" placeholder="Link gói 1 ngày">
-    <input type="text" id="l3" placeholder="Link gói 3 ngày">
-    <input type="text" id="l7" placeholder="Link gói 7 ngày">
-    <button style="background: #ffc107; color: black;" onclick="upLink()">Cập Nhật Link</button>
-</div>
+        <div class="card">
+            <h3>Cài đặt Link4M</h3>
+            <input type="text" id="l1" placeholder="Link 1 Ngày">
+            <input type="text" id="l3" placeholder="Link 3 Ngày">
+            <input type="text" id="l7" placeholder="Link 7 Ngày">
+            <button onclick="saveLinks()">LƯU LINK</button>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+        <h3>Danh Sách Người Dùng & Key</h3>
+        <table border="1">
+            <thead>
+                <tr><th>User</th><th>Pass</th><th>Status</th><th>Exp</th><th>Hành động</th></tr>
+            </thead>
+            <tbody id="user-list"></tbody>
+        </table>
+    </div>
 
 <script>
     const firebaseConfig = {
@@ -47,27 +58,42 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function check() {
-        if(document.getElementById('ad-p').value === "LONG") {
-            document.getElementById('lock').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
-        }
-    }
-
-    function gen() {
-        const d = document.getElementById('days').value;
+    function genKey() {
+        const d = document.getElementById('k-days').value;
         const k = "YOR-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-        db.ref('keys/' + k).set({ duration: d, used: false }).then(() => {
-            document.getElementById('res').innerText = "Đã tạo: " + k;
+        db.ref('keys/' + k).set({ duration: d, used: false })
+        .then(() => {
+            document.getElementById('new-key').innerText = "MÃ MỚI: " + k;
+            Swal.fire('Xong', 'Đã tạo key thành công', 'success');
         });
     }
 
-    function upLink() {
+    function saveLinks() {
         db.ref('settings/links').set({
             d1: document.getElementById('l1').value,
             d3: document.getElementById('l3').value,
             d7: document.getElementById('l7').value
-        }).then(() => alert("Đã lưu link!"));
+        }).then(() => Swal.fire('Thành công', 'Đã lưu cấu hình link!', 'success'));
+    }
+
+    // Load user database
+    db.ref('users').on('value', s => {
+        const users = s.val();
+        let html = "";
+        for(let u in users) {
+            html += `<tr>
+                <td>${u}</td>
+                <td>${users[u].password}</td>
+                <td>${users[u].status}</td>
+                <td>${users[u].exp}</td>
+                <td><button onclick="ban('${u}', ${users[u].banned})">${users[u].banned ? 'Unban' : 'BAN'}</button></td>
+            </tr>`;
+        }
+        document.getElementById('user-list').innerHTML = html;
+    });
+
+    function ban(u, st) {
+        db.ref('users/' + u).update({ banned: !st });
     }
 </script>
 </body>
