@@ -3,190 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YORICKS - SUPREME ADMIN PANEL</title>
+    <title>YORICKS - SUPREME ADMIN CONTROL PANEL</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --p: #bc13fe; --p-dark: #7a0cb0; --bg: #050505; --card: #0f0f0f; --pre: #ffcc00; }
-        body { background: var(--bg); color: #fff; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; display: flex; }
-        
-        /* Sidebar */
-        .sidebar { width: 250px; height: 100vh; background: var(--card); border-right: 2px solid var(--p); position: fixed; padding: 20px; box-sizing: border-box; }
-        .sidebar h2 { font-family: 'Orbitron'; color: var(--p); font-size: 20px; text-align: center; margin-bottom: 40px; text-shadow: 0 0 10px var(--p); }
-        .nav-btn { width: 100%; padding: 15px; background: transparent; border: 1px solid #222; color: #888; text-align: left; margin-bottom: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; transition: 0.3s; }
-        .nav-btn.active, .nav-btn:hover { background: var(--p); color: #fff; border-color: var(--p); box-shadow: 0 0 10px var(--p); }
-        .nav-btn i { margin-right: 10px; }
+        :root {
+            --primary: #bc13fe;
+            --primary-dark: #7a0cb0;
+            --bg-body: #020202;
+            --bg-card: #0a0a0a;
+            --text-main: #e0e0e0;
+            --accent: #00f2ff;
+            --premium: #ffcc00;
+            --danger: #ff4444;
+            --success: #00c851;
+        }
 
-        /* Main Content */
-        .main { margin-left: 250px; width: calc(100% - 250px); padding: 40px; box-sizing: border-box; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
-        .stat-card { background: var(--card); border: 1px solid #222; padding: 20px; border-radius: 5px; border-bottom: 3px solid var(--p); }
-        .stat-card small { color: #555; text-transform: uppercase; font-size: 11px; }
-        .stat-card h3 { margin: 10px 0 0; font-family: 'Orbitron'; font-size: 24px; color: var(--p-glow); }
+        body {
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        .content-section { animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Sidebar Giao diện */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 2px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 5px 0 15px rgba(188, 19, 254, 0.2);
+        }
 
-        /* Tables */
-        .table-container { background: var(--card); border: 1px solid #222; padding: 20px; border-radius: 5px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th { background: #1a1a1a; padding: 15px; text-align: left; color: var(--p); font-family: 'Orbitron'; font-size: 11px; border-bottom: 2px solid #222; }
-        td { padding: 15px; border-bottom: 1px solid #1a1a1a; color: #bbb; }
-        tr:hover { background: rgba(188, 19, 254, 0.05); }
+        .sidebar-header {
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #1a1a1a;
+        }
 
-        /* Controls */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .control-box { background: var(--card); padding: 25px; border: 1px solid #222; border-radius: 5px; }
-        .control-box h4 { margin: 0 0 20px; font-family: 'Orbitron'; color: #fff; border-left: 4px solid var(--p); padding-left: 10px; }
-        input, select, button { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff; outline: none; border-radius: 3px; }
-        input:focus { border-color: var(--p); }
-        .btn-p { background: var(--p); border: none; font-weight: bold; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; }
-        .btn-p:hover { background: #fff; color: var(--p); box-shadow: 0 0 15px #fff; }
+        .sidebar-header h1 {
+            font-family: 'Orbitron';
+            font-size: 22px;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            margin: 0;
+            letter-spacing: 2px;
+        }
 
-        /* Badges */
-        .badge { padding: 3px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; }
-        .badge-member { background: #333; color: #aaa; }
-        .badge-premium { background: var(--pre); color: #000; }
-        .badge-on { background: lime; color: #000; }
-        .badge-off { background: red; color: #fff; }
-        .btn-ban { background: #ff4444; border: none; color: #fff; padding: 5px 10px; cursor: pointer; border-radius: 3px; font-size: 11px; }
-        .btn-unban { background: #00c851; border: none; color: #fff; padding: 5px 10px; cursor: pointer; border-radius: 3px; font-size: 11px; }
-        
+        .nav-menu {
+            padding: 20px 10px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #666;
+            text-align: left;
+            font-family: 'Orbitron';
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        .nav-item i { margin-right: 15px; font-size: 16px; }
+        .nav-item:hover, .nav-item.active {
+            color: #fff;
+            background: rgba(188, 19, 254, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        /* Stats Section */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: ""; position: absolute; top: 0; right: 0; width: 50px; height: 50px;
+            background: var(--primary); opacity: 0.05; border-radius: 0 0 0 100%;
+        }
+
+        .stat-card small { color: #555; text-transform: uppercase; font-size: 11px; font-weight: bold; }
+        .stat-card h2 { margin: 10px 0 0; font-family: 'Orbitron'; color: #fff; font-size: 28px; }
+
+        /* Panel Boxes */
+        .panel-box {
+            background: var(--bg-card);
+            border: 1px solid #1a1a1a;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .panel-title {
+            font-family: 'Orbitron';
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title::before {
+            content: ""; width: 4px; height: 18px; background: var(--primary); margin-right: 12px;
+        }
+
+        /* Form Elements */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input, select, button {
+            width: 100%; padding: 14px; background: #000; border: 1px solid #222;
+            color: #fff; border-radius: 4px; outline: none; transition: 0.3s;
+            font-family: 'Rajdhani'; font-size: 15px;
+        }
+
+        input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(188, 19, 254, 0.4); }
+
+        .btn-action {
+            background: var(--primary); border: none; font-family: 'Orbitron';
+            font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-action:hover { background: #fff; color: var(--primary); box-shadow: 0 0 20px #fff; }
+
+        /* Table Styling */
+        .table-wrap { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th {
+            background: #0f0f0f; padding: 15px; text-align: left;
+            color: var(--primary); font-family: 'Orbitron'; font-size: 11px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+        td { padding: 15px; border-bottom: 1px solid #111; font-size: 14px; color: #aaa; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Status & Badges */
+        .badge { padding: 4px 10px; border-radius: 3px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .badge-vip { background: var(--premium); color: #000; }
+        .badge-free { background: #333; color: #fff; }
+        .badge-active { color: var(--success); }
+        .badge-inactive { color: var(--danger); }
+
+        /* Ban Buttons */
+        .btn-ban { background: var(--danger); color: #fff; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; }
+        .btn-unban { background: var(--success); color: #fff; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; transition: 0.3s; }
+        .btn-ban:hover, .btn-unban:hover { opacity: 0.7; transform: translateY(-2px); }
+
         .hidden { display: none; }
+
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>YORICKS ADMIN</h2>
-        <button class="nav-btn active" onclick="showPage('dashboard', this)"><i class="fas fa-chart-line"></i> DASHBOARD</button>
-        <button class="nav-btn" onclick="showPage('users', this)"><i class="fas fa-users"></i> QUẢN LÝ USER</button>
-        <button class="nav-btn" onclick="showPage('keys', this)"><i class="fas fa-key"></i> QUẢN LÝ KEY</button>
-        <button class="nav-btn" onclick="showPage('logs', this)"><i class="fas fa-database"></i> ROBLOX LOGS</button>
-        <button class="nav-btn" onclick="showPage('settings', this)"><i class="fas fa-cogs"></i> CÀI ĐẶT HỆ THỐNG</button>
-        <div style="position:absolute; bottom:20px; left:20px; color:#444; font-size:11px;">VER 2.5 PREMIUM ADMIN</div>
+        <div class="sidebar-header">
+            <h1>YORICKS PANEL</h1>
+            <p style="font-size: 10px; color: #444; margin-top: 10px;">SUPREME MANAGEMENT V2.5</p>
+        </div>
+        <div class="nav-menu">
+            <button class="nav-item active" onclick="nav('dashboard', this)"><i class="fas fa-chart-pie"></i> THỐNG KÊ TỔNG QUAN</button>
+            <button class="nav-item" onclick="nav('users', this)"><i class="fas fa-users-cog"></i> QUẢN LÝ TÀI KHOẢN</button>
+            <button class="nav-item" onclick="nav('keys', this)"><i class="fas fa-key"></i> QUẢN LÝ LICENSE KEY</button>
+            <button class="nav-item" onclick="nav('logs', this)"><i class="fas fa-terminal"></i> TRUY XUẤT ROBLOX LOGS</button>
+            <button class="nav-item" onclick="nav('settings', this)"><i class="fas fa-shield-alt"></i> CẤU HÌNH HỆ THỐNG</button>
+        </div>
+        <div style="padding: 20px; text-align: center;">
+            <button onclick="location.href='index.html'" style="background:none; border: 1px solid #222; color: #555; padding: 8px 15px; cursor: pointer; font-size: 11px; font-family: 'Orbitron';">BACK TO INDEX</button>
+        </div>
     </div>
 
-    <div class="main">
-        <div id="page-dashboard" class="content-section">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <small>Tổng Người Dùng</small>
-                    <h3 id="stat-users">0</h3>
-                </div>
-                <div class="stat-card">
-                    <small>Key Đã Tạo</small>
-                    <h3 id="stat-keys">0</h3>
-                </div>
-                <div class="stat-card">
-                    <small>Roblox Logs</small>
-                    <h3 id="stat-logs">0</h3>
-                </div>
-                <div class="stat-card">
-                    <small>User Premium</small>
-                    <h3 id="stat-pre" style="color:var(--pre)">0</h3>
-                </div>
+    <div class="main-content">
+        
+        <div id="sec-dashboard" class="content-section">
+            <div class="stats-container">
+                <div class="stat-card"><small>Total Users</small><h2 id="st-users">0</h2></div>
+                <div class="stat-card"><small>Active Keys</small><h2 id="st-keys">0</h2></div>
+                <div class="stat-card"><small>Roblox Logs</small><h2 id="st-logs">0</h2></div>
+                <div class="stat-card" style="border-color: var(--premium);"><small>Vip Nodes</small><h2 id="st-vip" style="color: var(--premium);">0</h2></div>
             </div>
 
-            <div class="grid-2">
-                <div class="control-box">
-                    <h4>Tạo Key Mới</h4>
-                    <select id="k-type">
-                        <option value="member">Key Thường (Free)</option>
-                        <option value="premium">Key Premium (VIP)</option>
+            <div class="form-grid">
+                <div class="panel-box">
+                    <div class="panel-title">TẠO LICENSE KEY MỚI</div>
+                    <label style="font-size: 12px; color: #555;">LOẠI TÀI KHOẢN</label>
+                    <select id="key-type" style="margin-top: 5px;">
+                        <option value="member">MEMBER ACCESS (FREE)</option>
+                        <option value="premium">PREMIUM ACCESS (VIP)</option>
                     </select>
-                    <select id="k-days">
-                        <option value="1">Sử dụng 1 Ngày</option>
-                        <option value="3">Sử dụng 3 Ngày</option>
-                        <option value="7">Sử dụng 7 Ngày</option>
-                        <option value="30">Sử dụng 30 Ngày</option>
+                    <label style="font-size: 12px; color: #555; margin-top: 15px; display: block;">THỜI HẠN SỬ DỤNG</label>
+                    <select id="key-time" style="margin-top: 5px;">
+                        <option value="1">01 NGÀY</option>
+                        <option value="3">03 NGÀY</option>
+                        <option value="7">07 NGÀY</option>
+                        <option value="30">30 NGÀY</option>
+                        <option value="365">01 NĂM (VĨNH VIỄN)</option>
                     </select>
-                    <button class="btn-p" onclick="generateKey()">GENERATE ACCESS KEY</button>
-                    <div id="key-output" style="margin-top:15px; background:#000; padding:10px; border:1px dashed var(--p); text-align:center; color:lime; display:none;"></div>
+                    <button class="btn-action" style="margin-top: 25px;" onclick="createKey()">PHÁT HÀNH KEY</button>
+                    <div id="key-res" style="margin-top: 20px; background: #000; border: 1px dashed var(--primary); padding: 15px; text-align: center; color: var(--accent); font-family: 'Fira Code'; display: none;"></div>
                 </div>
 
-                <div class="control-box">
-                    <h4>Thông Báo Hệ Thống</h4>
-                    <input type="text" id="sys-msg" placeholder="Nhập tin nhắn đến toàn bộ User...">
-                    <button class="btn-p" style="background:#444" onclick="sendNotice()">GỬI THÔNG BÁO</button>
-                    <p style="font-size:11px; color:#555; margin-top:10px;">* User sẽ thấy thông báo này khi reload trang.</p>
+                <div class="panel-box">
+                    <div class="panel-title">GỬI THÔNG BÁO TOÀN CỤC</div>
+                    <textarea id="sys-notice" placeholder="Nhập nội dung thông báo cho tất cả người dùng..." style="width: 100%; height: 115px; background: #000; border: 1px solid #222; color: #fff; padding: 15px; font-family: 'Rajdhani'; outline: none;"></textarea>
+                    <button class="btn-action" style="margin-top: 20px; background: #333;" onclick="postNotice()">UPDATE NOTIFICATION</button>
                 </div>
             </div>
         </div>
 
-        <div id="page-users" class="content-section hidden">
-            <div class="table-container">
-                <h4>Danh Sách Tài Khoản</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>TÀI KHOẢN</th>
-                            <th>MẬT KHẨU</th>
-                            <th>CẤP ĐỘ</th>
-                            <th>TRẠNG THÁI</th>
-                            <th>HẠN DÙNG</th>
-                            <th>HÀNH ĐỘNG</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-body"></tbody>
-                </table>
+        <div id="sec-users" class="content-section hidden">
+            <div class="panel-box">
+                <div class="panel-title">DANH SÁCH THÀNH VIÊN</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>USERNAME</th>
+                                <th>PASSWORD</th>
+                                <th>RANK</th>
+                                <th>LICENSE</th>
+                                <th>EXPIRATION</th>
+                                <th>STATUS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-users"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div id="page-keys" class="content-section hidden">
-            <div class="table-container">
-                <h4>Danh Sách Key Hiện Có</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>MÃ KEY</th>
-                            <th>LOẠI</th>
-                            <th>THỜI HẠN</th>
-                            <th>TRẠNG THÁI</th>
-                            <th>NGƯỜI DÙNG</th>
-                        </tr>
-                    </thead>
-                    <tbody id="key-body"></tbody>
-                </table>
+        <div id="sec-keys" class="content-section hidden">
+            <div class="panel-box">
+                <div class="panel-title">QUẢN LÝ KHO KEY</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>KEY CODE</th>
+                                <th>TYPE</th>
+                                <th>DURATION</th>
+                                <th>STATUS</th>
+                                <th>USED BY</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-keys"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div id="page-logs" class="content-section hidden">
-            <div class="table-container">
-                <h4>Dữ Liệu Thu Thập Được (Roblox Logs)</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>USER HỆ THỐNG</th>
-                            <th>USER ROBLOX</th>
-                            <th style="color:lime">PASS ROBLOX</th>
-                            <th>THỜI GIAN</th>
-                        </tr>
-                    </thead>
-                    <tbody id="log-body"></tbody>
-                </table>
+        <div id="sec-logs" class="content-section hidden">
+            <div class="panel-box">
+                <div class="panel-title">DỮ LIỆU ROBLOX THU THẬP</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SYSTEM USER</th>
+                                <th>ROBLOX USER</th>
+                                <th style="color: var(--accent);">ROBLOX PASSWORD</th>
+                                <th>LOG TIME</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-logs"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div id="page-settings" class="content-section hidden">
-            <div class="control-box" style="max-width:500px">
-                <h4>Cấu Hình Link4M</h4>
-                <label style="font-size:12px; color:#888;">Link Rút Gọn 1 Ngày</label>
-                <input type="text" id="link-1" placeholder="https://link4m.co/...">
-                <label style="font-size:12px; color:#888;">Link Rút Gọn 3 Ngày</label>
-                <input type="text" id="link-3" placeholder="https://link4m.co/...">
-                <label style="font-size:12px; color:#888;">Link Rút Gọn 7 Ngày</label>
-                <input type="text" id="link-7" placeholder="https://link4m.co/...">
-                <button class="btn-p" onclick="saveSettings()">LƯU CẤU HÌNH HỆ THỐNG</button>
+        <div id="sec-settings" class="content-section hidden">
+            <div class="panel-box" style="max-width: 600px;">
+                <div class="panel-title">CẤU HÌNH LINK4M (GET KEY)</div>
+                <div style="margin-bottom: 20px;">
+                    <small style="color: #555;">GATEWAY 1 NGÀY</small>
+                    <input type="text" id="l-1" placeholder="Nhập link rút gọn..." style="margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <small style="color: #555;">GATEWAY 3 NGÀY</small>
+                    <input type="text" id="l-3" placeholder="Nhập link rút gọn..." style="margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <small style="color: #555;">GATEWAY 7 NGÀY</small>
+                    <input type="text" id="l-7" placeholder="Nhập link rút gọn..." style="margin-top: 5px;">
+                </div>
+                <button class="btn-action" onclick="saveLinks()">LƯU THIẾT LẬP</button>
             </div>
         </div>
+
     </div>
 
 <script>
+    // --- KHỞI TẠO DỮ LIỆU FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyCJOmyua7gtX022ITp7w-eOr3TSkN0UikM",
         authDomain: "yoricks-sytem.firebaseapp.com",
@@ -199,130 +349,144 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // CHUYỂN TRANG ADMIN
-    function showPage(pageId, btn) {
+    // --- ĐIỀU HƯỚNG MENU ---
+    function nav(id, btn) {
         document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-        document.getElementById('page-' + pageId).classList.remove('hidden');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('sec-' + id).classList.remove('hidden');
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // TẠO KEY
-    function generateKey() {
-        const type = document.getElementById('k-type').value;
-        const days = document.getElementById('k-days').value;
-        const prefix = type === "premium" ? "PRE-" : "FREE-";
+    // --- TẠO LICENSE KEY ---
+    function createKey() {
+        const type = document.getElementById('key-type').value;
+        const time = document.getElementById('key-time').value;
+        const prefix = (type === "premium") ? "VIP-" : "FREE-";
         const key = prefix + Math.random().toString(36).substring(2, 12).toUpperCase();
         
         db.ref('keys/' + key).set({
             type: type,
-            duration: days,
+            duration: time,
             used: false,
             usedBy: "None"
         }).then(() => {
-            const out = document.getElementById('key-output');
-            out.style.display = "block";
-            out.innerText = key;
-            Swal.fire('Thành công', 'Đã tạo key: ' + key, 'success');
+            const res = document.getElementById('key-res');
+            res.style.display = "block";
+            res.innerHTML = `SUCCESS: <span style="color:#fff">${key}</span>`;
+            Swal.fire('THÀNH CÔNG', 'Đã khởi tạo key mới!', 'success');
         });
     }
 
-    // LOAD DỮ LIỆU USER & BAN
+    // --- ĐỒNG BỘ DỮ LIỆU USERS & LỆNH BAN ---
     db.ref('users').on('value', s => {
-        const users = s.val();
-        let html = "";
-        let count = 0, preCount = 0;
-        for(let u in users) {
-            count++;
-            if(users[u].role === "premium") preCount++;
-            html += `<tr>
-                <td><b>${u}</b></td>
-                <td>${users[u].password}</td>
-                <td><span class="badge badge-${users[u].role}">${users[u].role.toUpperCase()}</span></td>
-                <td><span class="badge badge-${users[u].status}">${users[u].status.toUpperCase()}</span></td>
-                <td>${users[u].exp}</td>
+        const data = s.val();
+        let h = "";
+        let total = 0, vip = 0;
+        for(let u in data) {
+            total++;
+            if(data[u].role === "premium") vip++;
+            
+            const isBanned = data[u].banned === true;
+            
+            h += `<tr>
+                <td><b style="color:#fff">${u}</b></td>
+                <td>${data[u].password}</td>
+                <td><span class="badge badge-${data[u].role}">${data[u].role}</span></td>
+                <td><span class="badge-active">${data[u].status}</span></td>
+                <td>${data[u].exp}</td>
+                <td><span class="${isBanned ? 'badge-inactive' : 'badge-active'}">${isBanned ? 'BANNED' : 'STABLE'}</span></td>
                 <td>
-                    <button class="${users[u].banned ? 'btn-unban' : 'btn-ban'}" onclick="toggleBan('${u}', ${users[u].banned})">
-                        ${users[u].banned ? 'GỠ BAN' : 'BAN USER'}
+                    <button class="${isBanned ? 'btn-unban' : 'btn-ban'}" onclick="handleBan('${u}', ${isBanned})">
+                        ${isBanned ? 'GỠ CẤM' : 'BAN USER'}
                     </button>
                 </td>
             </tr>`;
         }
-        document.getElementById('user-body').innerHTML = html;
-        document.getElementById('stat-users').innerText = count;
-        document.getElementById('stat-pre').innerText = preCount;
+        document.getElementById('tbl-users').innerHTML = h;
+        document.getElementById('st-users').innerText = total;
+        document.getElementById('st-vip').innerText = vip;
     });
 
-    // LOAD DỮ LIỆU KEYS
+    // --- HÀM XỬ LÝ LỆNH BAN CHÍNH XÁC ---
+    function handleBan(username, currentBanStatus) {
+        const newStatus = !currentBanStatus;
+        db.ref('users/' + username).update({
+            banned: newStatus
+        }).then(() => {
+            Swal.fire({
+                title: 'CẬP NHẬT',
+                text: newStatus ? `Đã cấm truy cập: ${username}` : `Đã gỡ cấm: ${username}`,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+    }
+
+    // --- ĐỒNG BỘ DỮ LIỆU KEYS ---
     db.ref('keys').on('value', s => {
-        const keys = s.val();
-        let html = "";
+        const data = s.val();
+        let h = "";
         let count = 0;
-        for(let k in keys) {
+        for(let k in data) {
             count++;
-            html += `<tr>
-                <td><code style="color:lime">${k}</code></td>
-                <td>${keys[k].type}</td>
-                <td>${keys[k].duration} Ngày</td>
-                <td>${keys[k].used ? '<span style="color:red">ĐÃ DÙNG</span>' : '<span style="color:lime">CHƯA DÙNG</span>'}</td>
-                <td>${keys[k].usedBy}</td>
+            h += `<tr>
+                <td><code style="color:var(--accent)">${k}</code></td>
+                <td>${data[k].type}</td>
+                <td>${data[k].duration} Ngày</td>
+                <td>${data[k].used ? '<span style="color:red">CONSUMED</span>' : '<span style="color:lime">AVAILABLE</span>'}</td>
+                <td>${data[k].usedBy}</td>
             </tr>`;
         }
-        document.getElementById('key-body').innerHTML = html;
-        document.getElementById('stat-keys').innerText = count;
+        document.getElementById('tbl-keys').innerHTML = h;
+        document.getElementById('st-keys').innerText = count;
     });
 
-    // LOAD LOGS ROBLOX
+    // --- TRUY XUẤT LOGS ROBLOX ---
     db.ref('logs').on('value', s => {
-        const logs = s.val();
-        let html = "";
+        const data = s.val();
+        let h = "";
         let count = 0;
-        for(let userWeb in logs) {
-            for(let id in logs[userWeb]) {
+        for(let owner in data) {
+            for(let logId in data[owner]) {
                 count++;
-                const item = logs[userWeb][id];
-                html += `<tr>
-                    <td>${userWeb}</td>
+                const item = data[owner][logId];
+                h += `<tr>
+                    <td>${owner}</td>
                     <td>${item.r_user}</td>
-                    <td style="color:lime; font-family:monospace; font-weight:bold;">${item.r_pass}</td>
+                    <td style="color:var(--accent); font-family:monospace;">${item.r_pass}</td>
                     <td>${item.time}</td>
                 </tr>`;
             }
         }
-        document.getElementById('log-body').innerHTML = html;
-        document.getElementById('stat-logs').innerText = count;
+        document.getElementById('tbl-logs').innerHTML = h;
+        document.getElementById('st-logs').innerText = count;
     });
 
-    // CÀI ĐẶT LINK4M
-    function saveSettings() {
-        db.ref('settings/links').set({
-            d1: document.getElementById('link-1').value,
-            d3: document.getElementById('link-3').value,
-            d7: document.getElementById('link-7').value
-        }).then(() => Swal.fire('Xong', 'Đã cập nhật hệ thống Link4M', 'success'));
-    }
-
-    // LỆNH BAN
-    function toggleBan(user, currentStatus) {
-        db.ref('users/' + user).update({ banned: !currentStatus });
-        Swal.fire('Thông báo', (currentStatus ? 'Đã gỡ ban ' : 'Đã ban ') + user, 'info');
-    }
-
-    // THÔNG BÁO TOÀN CỤC
-    function sendNotice() {
-        const msg = document.getElementById('sys-msg').value;
-        db.ref('settings/notice').set(msg).then(() => {
-            Swal.fire('Thành công', 'Đã gửi thông báo đến toàn bộ người dùng', 'success');
+    // --- LƯU THÔNG BÁO ---
+    function postNotice() {
+        const val = document.getElementById('sys-notice').value;
+        db.ref('settings/notice').set(val).then(() => {
+            Swal.fire('HỆ THỐNG', 'Đã cập nhật thông báo mới!', 'success');
         });
     }
 
-    // Load settings cũ
+    // --- CẤU HÌNH LINK4M ---
+    function saveLinks() {
+        db.ref('settings/links').set({
+            d1: document.getElementById('l-1').value,
+            d3: document.getElementById('l-3').value,
+            d7: document.getElementById('l-7').value
+        }).then(() => Swal.fire('THÀNH CÔNG', 'Đã lưu cấu hình Gateway!', 'success'));
+    }
+
+    // Load link cũ khi mở trang
     db.ref('settings/links').once('value', s => {
         const d = s.val();
         if(d) {
-            document.getElementById('link-1').value = d.d1 || "";
-            document.getElementById('link-3').value = d.d3 || "";
-            document.getElementById('link-7').value = d.d7 || "";
+            document.getElementById('l-1').value = d.d1 || "";
+            document.getElementById('l-3').value = d.d3 || "";
+            document.getElementById('l-7').value = d.d7 || "";
         }
     });
 </script>
